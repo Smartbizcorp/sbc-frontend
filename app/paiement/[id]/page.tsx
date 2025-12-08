@@ -4,25 +4,81 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+
 export default function PaiementChoixPage({
   params,
 }: {
-  params: { id: string };
+  params: { id: string }; // ⚠️ ici id = montant, pas l'ID d'investissement
 }) {
-  const investmentId = params.id;
-  const [message, setMessage] = useState<string | null>(null);
+  const amountXOF = Number(params.id || "0");
 
-  const handleWaveClick = () => {
-    // Ouvre la page de paiement Wave dans un nouvel onglet
-    window.open(
-      "https://pay.wave.com/m/M_sn_5pLfEghRDWoV/c/sn/",
-      "_blank",
-      "noopener,noreferrer"
-    );
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loadingWave, setLoadingWave] = useState(false);
+  const [createdInvestmentId, setCreatedInvestmentId] = useState<number | null>(
+    null
+  );
+
+  const handleWaveClick = async () => {
+    if (!amountXOF || Number.isNaN(amountXOF)) {
+      setError(
+        "Montant invalide. Merci de revenir à l'écran précédent et de choisir un palier."
+      );
+      return;
+    }
+
+    // on évite le double-clic
+    if (loadingWave || createdInvestmentId) return;
+
+    setLoadingWave(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const res = await fetch(`${API_URL}/api/investments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // important pour envoyer le cookie sbc_token
+        body: JSON.stringify({ amountXOF }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(
+          data.message || "Impossible de créer l'investissement."
+        );
+      }
+
+      const investment = data.investment;
+      setCreatedInvestmentId(investment.id);
+
+      setMessage(
+        `Votre demande d'investissement de ${amountXOF.toLocaleString(
+          "fr-FR"
+        )} XOF a été enregistrée (ID #${investment.id}, statut PENDING).`
+      );
+
+      // 👉 on ouvre ensuite la page de paiement Wave
+      window.open(
+        "https://pay.wave.com/m/M_sn_5pLfEghRDWoV/c/sn/",
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } catch (err: any) {
+      setError(
+        err?.message ||
+          "Erreur lors de la création de l'investissement. Veuillez réessayer."
+      );
+    } finally {
+      setLoadingWave(false);
+    }
   };
 
   const handleOrangeClick = () => {
-    setMessage("Service indisponible pour le moment.");
+    setMessage("Service Orange Money indisponible pour le moment.");
   };
 
   return (
@@ -33,26 +89,42 @@ export default function PaiementChoixPage({
         </h1>
 
         <p className="text-sm text-sbc-muted text-center">
-          Investissement ID #{investmentId}. Sélectionnez un mode de paiement
-          pour finaliser votre demande.
+          Montant sélectionné :{" "}
+          <span className="font-semibold text-sbc-gold">
+            {amountXOF.toLocaleString("fr-FR")} XOF
+          </span>
+          . Sélectionnez un mode de paiement pour enregistrer votre demande.
         </p>
+
+        {createdInvestmentId && (
+          <p className="text-xs text-center text-sbc-muted">
+            Demande enregistrée avec l&apos;ID{" "}
+            <span className="font-semibold text-sbc-gold">
+              #{createdInvestmentId}
+            </span>{" "}
+            (statut PENDING).
+          </p>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
           {/* Bouton Wave */}
           <button
             onClick={handleWaveClick}
-            className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-sbc-border bg-sbc-bg px-6 py-4 hover:border-sbc-gold hover:shadow-[0_0_25px_rgba(212,158,58,0.55)] transition"
+            disabled={loadingWave || !!createdInvestmentId}
+            className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-sbc-border bg-sbc-bg px-6 py-4 hover:border-sbc-gold hover:shadow-[0_0_25px_rgba(212,158,58,0.55)] disabled:opacity-60 disabled:cursor-not-allowed transition"
           >
             <div className="relative w-28 h-28">
               <Image
-                src="/logos/wave.png" // mets ici le bon chemin de ton logo Wave
+                src="/logos/wave.png"
                 alt="Payer avec Wave"
                 fill
                 className="object-contain"
               />
             </div>
             <span className="text-sm font-semibold text-sbc-text group-hover:text-sbc-gold">
-              Payer avec Wave
+              {loadingWave
+                ? "Création de la demande..."
+                : "Payer avec Wave"}
             </span>
           </button>
 
@@ -63,7 +135,7 @@ export default function PaiementChoixPage({
           >
             <div className="relative w-28 h-28">
               <Image
-                src="/logos/orange-money.png" // mets ici le bon chemin de ton logo Orange Money
+                src="/logos/orange-money.png"
                 alt="Payer avec Orange Money"
                 fill
                 className="object-contain"
@@ -75,8 +147,14 @@ export default function PaiementChoixPage({
           </button>
         </div>
 
-        {message && (
-          <p className="mt-4 text-center text-sm text-red-400">{message}</p>
+        {error && (
+          <p className="mt-4 text-center text-sm text-red-400">{error}</p>
+        )}
+
+        {message && !error && (
+          <p className="mt-4 text-center text-sm text-sbc-muted">
+            {message}
+          </p>
         )}
 
         <div className="pt-4 flex justify-center">

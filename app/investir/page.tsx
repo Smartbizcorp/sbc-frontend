@@ -84,7 +84,8 @@ export default function InvestirPage() {
       );
       clearInterval(interval);
     };
-  }, [lastActivity]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastActivity]);
 
   // Charge user + investissements
   useEffect(() => {
@@ -99,13 +100,14 @@ export default function InvestirPage() {
         const parsedUser = JSON.parse(rawUser) as UserInfo;
         setUser(parsedUser);
 
-        const { res, json } = await fetchJson(
-          `${API_BASE}/api/investments`,
-          { credentials: "include" }
-        );
+        const { res, json } = await fetchJson(`${API_BASE}/api/investments`, {
+          credentials: "include",
+        });
 
         if (!res.ok || !json.success) {
-          throw new Error(json.message || "Erreur chargement investissements.");
+          throw new Error(
+            json.message || "Erreur chargement investissements."
+          );
         }
 
         setInvestments(json.investments || []);
@@ -118,9 +120,9 @@ export default function InvestirPage() {
   }, [router]);
 
   // ------------------------------------------------
-  //   VALIDER LE PALIER  →  CRÉER INVEST + REDIRECT
+  //   VALIDER LE PALIER  →  REDIRECT VERS PAIEMENT
   // ------------------------------------------------
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSuccessMessage("");
     setErrorMessage("");
@@ -130,40 +132,11 @@ export default function InvestirPage() {
       return;
     }
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
-      const { res, json } = await fetchJson(`${API_BASE}/api/investments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ amountXOF: selectedTier }), // ✅ conforme à ton backend
-      });
-
-      if (!res.ok) {
-        throw new Error(json.message || "Erreur lors de la création de l'investissement.");
-      }
-
-      if (!json.success) {
-        throw new Error(json.message || "Erreur lors de la création de l'investissement.");
-      }
-
-      const investmentId = json.investment.id as number;
-
-      // 🔁 Optionnel : on met à jour la liste locale (au cas où tu reviens avec back)
-      setInvestments((prev) => [json.investment, ...prev]);
-
-      // 👉 Redirection vers la page de choix du moyen de paiement
-router.push(`/paiement/${investmentId}`);
-return;
-
-    } catch (e: any) {
-  console.error("ERR INVEST:", e);   // ⬅️ AJOUT IMPORTANT
-  setErrorMessage(e.message || "Erreur lors de l'enregistrement.");
-} finally {
-  setLoading(false);
-}
-
+    // ✅ On ne crée plus l'investissement ici
+    // 👉 On passe juste le montant au composant /paiement/[id]
+    router.push(`/paiement/${selectedTier}`);
   };
 
   if (errorMessage && !user) {
@@ -193,9 +166,10 @@ return;
             <span className="text-sbc-gold font-semibold">90&nbsp;jours</span>{" "}
             orientée vers la protection du capital. Votre demande passe d&apos;abord
             en statut{" "}
-            <span className="text-sbc-gold font-semibold">PENDING</span>,
-            puis devient <span className="text-sbc-gold font-semibold">ACTIVE</span>{" "}
-            une fois les fonds confirmés par l&apos;administration.
+            <span className="text-sbc-gold font-semibold">PENDING</span>, puis
+            devient{" "}
+            <span className="text-sbc-gold font-semibold">ACTIVE</span> une fois
+            les fonds confirmés par l&apos;administration.
           </p>
         </div>
 
@@ -285,7 +259,8 @@ return;
                 <span className="text-sbc-gold font-semibold">
                   {formatXOF(selectedTier)}
                 </span>
-                . Votre demande passera en statut{" "}
+                . Après validation, vous serez redirigé vers la page de paiement
+                où votre demande passera en statut{" "}
                 <span className="text-sbc-gold font-semibold">PENDING</span>,
                 puis sera validée après réception de vos fonds.
               </>
@@ -365,7 +340,6 @@ return;
 }
 
 /* Badge de statut */
-
 function StatusBadge({ status }: { status: InvestmentStatus }) {
   const base =
     "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px]";
