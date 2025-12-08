@@ -1,0 +1,450 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import Link from "next/link";
+import { normalizeSenegalPhone } from "@/src/utils/phone";
+import { register as apiRegister } from "../../lib/api";
+
+const SECURITY_QUESTIONS = [
+  "Nom de votre premier établissement scolaire",
+  "Nom de votre meilleur ami d’enfance",
+  "Nom de votre premier animal de compagnie",
+  "Ville où vous avez grandi",
+  "Métier rêvé quand vous étiez enfant",
+  "Marque de votre premier téléphone",
+  "Ville de naissance de votre mère",
+  "Lieu de votre premier emploi",
+  "Plat préféré de votre enfance",
+  "Titre du premier film vu au cinéma",
+] as const;
+
+export default function RegisterPage() {
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [waveNumber, setWaveNumber] = useState("");
+
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // 🔐 Question de sécurité
+  const [securityQuestion, setSecurityQuestion] = useState("");
+  const [securityAnswer, setSecurityAnswer] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // --- RÈGLES DE SÉCURITÉ (alignées sur ton backend : longueur + lettre + chiffre) ---
+  const hasLength = password.length >= 8;
+  const hasLetter = /[A-Za-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasUpper = /[A-Z]/.test(password); // bonus (recommandé)
+
+  const isStrongPassword = (pwd: string) =>
+    pwd.length >= 8 && /[A-Za-z]/.test(pwd) && /[0-9]/.test(pwd);
+
+  // Score pour jauge : 0–4
+  const passwordScore = useMemo(() => {
+    let score = 0;
+    if (hasLength) score++;
+    if (hasLetter) score++;
+    if (hasNumber) score++;
+    if (hasUpper) score++;
+    return score;
+  }, [hasLength, hasLetter, hasNumber, hasUpper]);
+
+  const strengthLabel = useMemo(() => {
+    if (!password) return "";
+    if (passwordScore <= 1) return "Sécurité faible";
+    if (passwordScore === 2 || passwordScore === 3) return "Sécurité moyenne";
+    return "Sécurité forte";
+  }, [password, passwordScore]);
+
+  const strengthBarClass = useMemo(() => {
+    if (!password) return "bg-sbc-border";
+    if (passwordScore <= 1) return "bg-red-500";
+    if (passwordScore === 2 || passwordScore === 3) return "bg-amber-500";
+    return "bg-emerald-500";
+  }, [password, passwordScore]);
+
+  const strengthBarWidth = useMemo(() => {
+    if (!password) return "0%";
+    return `${(passwordScore / 4) * 100}%`;
+  }, [password, passwordScore]);
+
+  const passwordsMatch =
+    confirmPassword.length === 0 || password === confirmPassword;
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setSuccessMessage("");
+    setErrorMessage("");
+
+    if (!/^\+221\d{9}$/.test(phone)) {
+      setErrorMessage(
+        "Nous n'acceptons pour le moment que les numéros du Sénégal au format +221XXXXXXXXX."
+      );
+      setLoading(false);
+      return;
+    }
+
+    if (!/^\+221\d{9}$/.test(waveNumber)) {
+      setErrorMessage(
+        "Votre numéro Wave doit aussi être un numéro du Sénégal au format +221XXXXXXXXX."
+      );
+      setLoading(false);
+      return;
+    }
+
+    if (!isStrongPassword(password)) {
+      setErrorMessage(
+        "Mot de passe trop faible : min 8 caractères, au moins 1 lettre et 1 chiffre."
+      );
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage("Les mots de passe ne correspondent pas.");
+      setLoading(false);
+      return;
+    }
+
+    // 🔐 Validation question de sécurité obligatoire
+    if (!securityQuestion) {
+      setErrorMessage("Veuillez choisir une question de sécurité.");
+      setLoading(false);
+      return;
+    }
+
+    if (!securityAnswer.trim()) {
+      setErrorMessage(
+        "Veuillez renseigner la réponse à la question de sécurité."
+      );
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // On passe par lib/api.ts → POST /api/register
+      const data = await apiRegister({
+        fullName,
+        phone,
+        email,
+        waveNumber,
+        password,
+        securityQuestion,
+        securityAnswer,
+      });
+
+      if (!data || (typeof data === "object" && data.success === false)) {
+        throw new Error(
+          (data as any)?.message || "Erreur lors de l'inscription."
+        );
+      }
+
+      setSuccessMessage("Compte créé ! Vous pouvez vous connecter.");
+      setFullName("");
+      setPhone("");
+      setEmail("");
+      setWaveNumber("");
+      setPassword("");
+      setConfirmPassword("");
+      setSecurityQuestion("");
+      setSecurityAnswer("");
+    } catch (err: any) {
+      setErrorMessage(err.message || "Erreur lors de l'inscription.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Petits composants d’icône œil SVG
+  const EyeOpenIcon = () => (
+    <svg
+      className="w-4 h-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+
+  const EyeOffIcon = () => (
+    <svg
+      className="w-4 h-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+      <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.18 3.24" />
+      <path d="M1 1l22 22" />
+    </svg>
+  );
+
+  return (
+    <div className="max-w-3xl mx-auto flex flex-col gap-8">
+      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-8 shadow">
+        <p className="uppercase text-[11px] tracking-[0.25em] text-sbc-gold">
+          Inscription
+        </p>
+        <h1 className="text-3xl font-semibold mt-2 mb-3">
+          Créez votre compte Smart Business Corp
+        </h1>
+        <p className="text-sm text-sbc-muted leading-relaxed">
+          Inscrivez-vous pour commencer à investir et suivre vos gains.
+        </p>
+      </section>
+
+      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-8 shadow">
+        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+          {successMessage && (
+            <div className="text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/40 rounded-2xl px-3 py-2">
+              {successMessage}
+            </div>
+          )}
+          {errorMessage && (
+            <div className="text-xs text-red-400 bg-red-950/30 border border-red-700/40 rounded-2xl px-3 py-2">
+              {errorMessage}
+            </div>
+          )}
+
+          {/* Nom + téléphone */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              required
+              placeholder="Nom complet"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+            />
+
+            <input
+              type="tel"
+              required
+              placeholder="+221 77 000 00 00"
+              value={phone}
+              onChange={(e) => setPhone(normalizeSenegalPhone(e.target.value))}
+              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+            />
+          </div>
+
+          <input
+            type="email"
+            placeholder="Adresse email (optionnelle)"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+          />
+
+          {/* Mot de passe + confirmation + jauge + checklist */}
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Mot de passe */}
+            <div>
+              <label className="block text-xs font-medium text-sbc-muted mb-1">
+                Mot de passe
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="Mot de passe sécurisé"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text pr-9"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
+                  aria-label={
+                    showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"
+                  }
+                >
+                  {showPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
+                </button>
+              </div>
+
+              {/* Jauge de sécurité */}
+              <div className="mt-2 space-y-1">
+                <div className="w-full h-1.5 rounded-full bg-sbc-bg/80 overflow-hidden">
+                  <div
+                    className={`h-full ${strengthBarClass} transition-all duration-300`}
+                    style={{ width: strengthBarWidth }}
+                  />
+                </div>
+                {strengthLabel && (
+                  <p className="text-[10px] text-sbc-muted">{strengthLabel}</p>
+                )}
+              </div>
+
+              {/* Checklist */}
+              <ul className="mt-2 space-y-1 text-[10px] text-sbc-muted">
+                <li className="flex items-center gap-1">
+                  <span
+                    className={hasLength ? "text-emerald-400" : "text-sbc-muted"}
+                  >
+                    ●
+                  </span>
+                  <span>Au moins 8 caractères</span>
+                </li>
+                <li className="flex items-center gap-1">
+                  <span
+                    className={hasLetter ? "text-emerald-400" : "text-sbc-muted"}
+                  >
+                    ●
+                  </span>
+                  <span>Contient des lettres (a–z)</span>
+                </li>
+                <li className="flex items-center gap-1">
+                  <span
+                    className={hasNumber ? "text-emerald-400" : "text-sbc-muted"}
+                  >
+                    ●
+                  </span>
+                  <span>Contient des chiffres (0–9)</span>
+                </li>
+                <li className="flex items-center gap-1">
+                  <span
+                    className={hasUpper ? "text-emerald-400" : "text-sbc-muted"}
+                  >
+                    ●
+                  </span>
+                  <span>Majuscule recommandée (A–Z)</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Confirmer mot de passe */}
+            <div>
+              <label className="block text-xs font-medium text-sbc-muted mb-1">
+                Confirmer le mot de passe
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  placeholder="Confirmer le mot de passe"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text pr-9"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword((prev) => !prev)
+                  }
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
+                  aria-label={
+                    showConfirmPassword
+                      ? "Masquer la confirmation"
+                      : "Afficher la confirmation"
+                  }
+                >
+                  {showConfirmPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
+                </button>
+              </div>
+              {!passwordsMatch && (
+                <p className="mt-1 text-[10px] text-red-400">
+                  Les mots de passe ne correspondent pas.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Numéro Wave */}
+          <div>
+            <label className="block text-xs font-medium text-sbc-muted mb-1">
+              Numéro Wave
+            </label>
+            <input
+              type="tel"
+              required
+              placeholder="Numéro Wave (+221...)"
+              value={waveNumber}
+              onChange={(e) =>
+                setWaveNumber(normalizeSenegalPhone(e.target.value))
+              }
+              className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+            />
+          </div>
+
+          {/* Question de sécurité obligatoire */}
+          <div className="mt-2 pt-2 border-t border-sbc-border/40">
+            <h3 className="text-[11px] uppercase tracking-[0.18em] text-sbc-gold mb-2">
+              Question de sécurité (obligatoire)
+            </h3>
+
+            <div className="flex flex-col gap-2">
+              <div>
+                <label className="block text-xs font-medium text-sbc-muted mb-1">
+                  Question
+                </label>
+                <select
+                  required
+                  value={securityQuestion}
+                  onChange={(e) => setSecurityQuestion(e.target.value)}
+                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+                >
+                  <option value="">Sélectionnez une question</option>
+                  {SECURITY_QUESTIONS.map((q) => (
+                    <option key={q} value={q}>
+                      {q}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-sbc-muted mb-1">
+                  Réponse
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Votre réponse (secrète)"
+                  value={securityAnswer}
+                  onChange={(e) => setSecurityAnswer(e.target.value)}
+                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+                />
+                <p className="text-[10px] text-sbc-muted mt-1">
+                  Cette réponse vous sera demandée en cas de vérification
+                  de sécurité.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg font-semibold disabled:opacity-50"
+          >
+            {loading ? "Création..." : "Créer mon compte"}
+          </button>
+
+          <Link
+            href="/login"
+            className="text-xs text-sbc-muted underline hover:text-sbc-gold"
+          >
+            J’ai déjà un compte
+          </Link>
+        </form>
+      </section>
+    </div>
+  );
+}
