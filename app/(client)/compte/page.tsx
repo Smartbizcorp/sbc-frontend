@@ -278,11 +278,23 @@ export default function ComptePage() {
   };
 
   if (loading) {
-    return <div className="text-xs md:text-sm text-sbc-muted">Chargement...</div>;
+    return (
+      <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
+        <div className="max-w-3xl mx-auto text-xs md:text-sm text-sbc-muted">
+          Chargement...
+        </div>
+      </main>
+    );
   }
 
   if (!profile) {
-    return <div className="text-xs md:text-sm text-red-300">Erreur profil.</div>;
+    return (
+      <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
+        <div className="max-w-3xl mx-auto text-xs md:text-sm text-red-300">
+          Erreur profil.
+        </div>
+      </main>
+    );
   }
 
   const birthLocked = !!profile.birthDate;
@@ -325,456 +337,458 @@ export default function ComptePage() {
     !confirmPassword || newPassword === confirmPassword;
 
   return (
-    <div className="flex flex-col gap-8 md:gap-10">
-      {/* HEADER */}
-      <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.26em] text-sbc-gold">
-            Compte
-          </p>
-          <h1 className="text-2xl md:text-3xl font-semibold mt-1">
-            Paramètres du profil
-          </h1>
-          <p className="text-xs md:text-sm text-sbc-muted max-w-xl mt-2 leading-relaxed">
-            Gérez vos informations personnelles, vos coordonnées de paiement et
-            la sécurité votre compte Smart Business Corp.
-          </p>
-        </div>
-        <div className="text-xs md:text-sm text-sbc-muted">
-          <p>Client</p>
-          <p className="text-sbc-text font-medium">{profile.fullName}</p>
-          <p className="text-[11px]">{profile.phone}</p>
+    <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
+      <div className="w-full max-w-4xl mx-auto flex flex-col gap-8 md:gap-10">
+        {/* HEADER */}
+        <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.26em] text-sbc-gold">
+              Compte
+            </p>
+            <h1 className="text-2xl md:text-3xl font-semibold mt-1">
+              Paramètres du profil
+            </h1>
+            <p className="text-xs md:text-sm text-sbc-muted max-w-xl mt-2 leading-relaxed">
+              Gérez vos informations personnelles, vos coordonnées de paiement et
+              la sécurité votre compte Smart Business Corp.
+            </p>
+          </div>
+          <div className="text-xs md:text-sm text-sbc-muted">
+            <p>Client</p>
+            <p className="text-sbc-text font-medium">{profile.fullName}</p>
+            <p className="text-[11px]">{profile.phone}</p>
 
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="mt-2 px-4 py-1 rounded-full border border-sbc-gold text-sbc-gold text-[10px] md:text-xs font-semibold hover:bg-sbc-gold hover:text-sbc-bgSoft transition"
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="mt-2 px-4 py-1 rounded-full border border-sbc-gold text-sbc-gold text-[10px] md:text-xs font-semibold hover:bg-sbc-gold hover:text-sbc-bgSoft transition"
+            >
+              Mon Dashboard
+            </button>
+          </div>
+        </section>
+
+        {/* INFOS PERSONNELLES */}
+        <section className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+          <h2 className="text-sm md:text-base font-semibold text-sbc-gold mb-3">
+            Infos personnelles
+          </h2>
+
+          {errorProfile && (
+            <div className="mb-3 text-[11px] md:text-xs text-red-400 bg-red-950/30 border border-red-700/50 rounded-2xl px-3 py-2">
+              {errorProfile}
+            </div>
+          )}
+          {successProfile && (
+            <div className="mb-3 text-[11px] md:text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/50 rounded-2xl px-3 py-2">
+              {successProfile}
+            </div>
+          )}
+
+          <form
+            onSubmit={handleProfileSubmit}
+            className="flex flex-col gap-4 md:gap-5"
           >
-            Mon Dashboard
-          </button>
-        </div>
-      </section>
-
-      {/* INFOS PERSONNELLES */}
-      <section className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
-        <h2 className="text-sm md:text-base font-semibold text-sbc-gold mb-3">
-          Infos personnelles
-        </h2>
-
-        {errorProfile && (
-          <div className="mb-3 text-[11px] md:text-xs text-red-400 bg-red-950/30 border border-red-700/50 rounded-2xl px-3 py-2">
-            {errorProfile}
-          </div>
-        )}
-        {successProfile && (
-          <div className="mb-3 text-[11px] md:text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/50 rounded-2xl px-3 py-2">
-            {successProfile}
-          </div>
-        )}
-
-        <form
-          onSubmit={handleProfileSubmit}
-          className="flex flex-col gap-4 md:gap-5"
-        >
-          {/* NOM + TELEPHONE */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] md:text-xs text-sbc-muted">
-                Nom complet
-              </label>
-              <input
-                type="text"
-                value={profile.fullName}
-                disabled
-                className="rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/60 px-3 py-2 text-xs md:text-sm text-sbc-text/80 outline-none cursor-not-allowed"
-              />
-              <p className="text-[10px] text-sbc-muted">Non modifiable.</p>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] md:text-xs text-sbc-muted">
-                Téléphone
-              </label>
-              <input
-                type="tel"
-                value={profile.phone}
-                disabled
-                className="rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/60 px-3 py-2 text-xs md:text-sm text-sbc-text/80 outline-none cursor-not-allowed"
-              />
-              <p className="text-[10px] text-sbc-muted">Non modifiable.</p>
-            </div>
-          </div>
-
-          {/* EMAIL + DATE */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] md:text-xs text-sbc-muted">
-                Adresse e-mail
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleProfileChange}
-                className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] md:text-xs text-sbc-muted">
-                Date de naissance
-              </label>
-              <input
-                type="date"
-                name="birthDate"
-                value={form.birthDate}
-                onChange={handleProfileChange}
-                disabled={birthLocked}
-                className={`rounded-2xl border px-3 py-2 text-xs md:text-sm text-sbc-text outline-none ${
-                  birthLocked
-                    ? "border-sbc-border/60 bg-sbc-bgSoft/60 cursor-not-allowed"
-                    : "border-sbc-border bg-sbc-bgSoft focus:border-sbc-gold transition"
-                }`}
-              />
-              <p className="text-[10px] text-sbc-muted">
-                {birthLocked
-                  ? "Non modifiable."
-                  : "Sera verrouillée après validation."}
-              </p>
-            </div>
-          </div>
-
-          {/* IDENTITE */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] md:text-xs text-sbc-muted">
-                Pièce d’identité
-              </label>
-              <select
-                name="idType"
-                value={form.idType}
-                onChange={handleProfileChange}
-                className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
-              >
-                <option value="">Sélectionnez une pièce</option>
-                {ID_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] md:text-xs text-sbc-muted">
-                Numéro de la pièce
-              </label>
-              <input
-                type="text"
-                name="idNumber"
-                value={form.idNumber}
-                onChange={handleProfileChange}
-                className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
-              />
-            </div>
-          </div>
-
-          {/* PAIEMENT */}
-          <div className="mt-4 pt-4 border-t border-sbc-border/40">
-            <h3 className="text-[11px] md:text-xs uppercase tracking-[0.18em] text-sbc-gold mb-3">
-              Infos de paiement
-            </h3>
+            {/* NOM + TELEPHONE */}
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Numéro Wave
+                  Nom complet
                 </label>
                 <input
-                  type="tel"
-                  name="waveNumber"
-                  value={form.waveNumber}
-                  onChange={handleProfileChange}
-                  className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                  type="text"
+                  value={profile.fullName}
+                  disabled
+                  className="rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/60 px-3 py-2 text-xs md:text-sm text-sbc-text/80 outline-none cursor-not-allowed"
                 />
+                <p className="text-[10px] text-sbc-muted">Non modifiable.</p>
               </div>
+
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Numéro Orange Money
+                  Téléphone
                 </label>
                 <input
                   type="tel"
-                  name="orangeMoneyNumber"
-                  value={form.orangeMoneyNumber}
-                  onChange={handleProfileChange}
-                  className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                  value={profile.phone}
+                  disabled
+                  className="rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/60 px-3 py-2 text-xs md:text-sm text-sbc-text/80 outline-none cursor-not-allowed"
                 />
+                <p className="text-[10px] text-sbc-muted">Non modifiable.</p>
               </div>
             </div>
-          </div>
 
-          {/* LOCALISATION */}
-          <div className="mt-4 pt-4 border-t border-sbc-border/40">
-            <h3 className="text-[11px] md:text-xs uppercase tracking-[0.18em] text-sbc-gold mb-3">
-              Localisation
-            </h3>
-
+            {/* EMAIL + DATE */}
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Pays
-                </label>
-                <select
-                  name="country"
-                  value={form.country}
-                  onChange={(e) => {
-                    handleProfileChange(e);
-                    const selected = AFRICA_COUNTRIES.find(
-                      (c) => c.name === e.target.value
-                    );
-                    if (selected) {
-                      setForm((prev) => ({
-                        ...prev,
-                        waveNumber: selected.prefix,
-                        orangeMoneyNumber: selected.prefix,
-                      }));
-                    }
-                  }}
-                  className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
-                >
-                  <option value="">Choisissez un pays</option>
-                  {AFRICA_COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.name}>
-                      {c.name} ({c.prefix})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Ville
+                  Adresse e-mail
                 </label>
                 <input
-                  type="text"
-                  name="city"
-                  value={form.city}
+                  type="email"
+                  name="email"
+                  value={form.email}
                   onChange={handleProfileChange}
                   className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
                 />
               </div>
-            </div>
-          </div>
-
-          {/* QUESTION SECURITE */}
-          <div className="mt-4 pt-4 border-t border-sbc-border/40">
-            <h3 className="text-[11px] md:text-xs uppercase tracking-[0.18em] text-sbc-gold mb-3">
-              Question de sécurité
-            </h3>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-col gap-1">
-                <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Question
-                </label>
-                <select
-                  name="securityQuestion"
-                  value={form.securityQuestion}
-                  onChange={handleProfileChange}
-                  className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
-                >
-                  <option value="">Sélectionnez une question</option>
-                  {SECURITY_QUESTIONS.map((q) => (
-                    <option key={q} value={q}>
-                      {q}
-                    </option>
-                  ))}
-                </select>
-              </div>
 
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Réponse
+                  Date de naissance
                 </label>
                 <input
-                  type="text"
-                  name="securityAnswer"
-                  value={form.securityAnswer}
+                  type="date"
+                  name="birthDate"
+                  value={form.birthDate}
                   onChange={handleProfileChange}
-                  className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                  disabled={birthLocked}
+                  className={`rounded-2xl border px-3 py-2 text-xs md:text-sm text-sbc-text outline-none ${
+                    birthLocked
+                      ? "border-sbc-border/60 bg-sbc-bgSoft/60 cursor-not-allowed"
+                      : "border-sbc-border bg-sbc-bgSoft focus:border-sbc-gold transition"
+                  }`}
                 />
                 <p className="text-[10px] text-sbc-muted">
-                  Stockée de manière sécurisée.
+                  {birthLocked
+                    ? "Non modifiable."
+                    : "Sera verrouillée après validation."}
                 </p>
               </div>
             </div>
-          </div>
 
-          <div className="mt-4 flex justify-end">
-            <button
-              type="submit"
-              disabled={savingProfile}
-              className="px-5 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bgSoft text-xs md:text-sm font-semibold transition disabled:opacity-60"
-            >
-              {savingProfile ? "Enregistrement..." : "Enregistrer les modifications"}
-            </button>
-          </div>
-        </form>
-      </section>
-
-      {/* MDP */}
-      <section className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
-        <h2 className="text-sm md:text-base font-semibold text-sbc-gold mb-3">
-          Sécurité du compte
-        </h2>
-
-        {errorPassword && (
-          <div className="mb-3 text-[11px] md:text-xs text-red-400 bg-red-950/30 border border-red-700/50 rounded-2xl px-3 py-2">
-            {errorPassword}
-          </div>
-        )}
-        {successPassword && (
-          <div className="mb-3 text-[11px] md:text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/50 rounded-2xl px-3 py-2">
-            {successPassword}
-          </div>
-        )}
-
-        <form
-          onSubmit={handlePasswordSubmit}
-          className="flex flex-col gap-4 md:gap-5"
-        >
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] md:text-xs text-sbc-muted">
-              Mot de passe actuel
-            </label>
-            <input
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
-            />
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Nouveau mot de passe */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] md:text-xs text-sbc-muted">
-                Nouveau mot de passe
-              </label>
-              <div className="relative">
-                <input
-                  type={showNewPassword ? "text" : "password"}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 pr-9 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword((v) => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
-                  aria-label={
-                    showNewPassword
-                      ? "Masquer le nouveau mot de passe"
-                      : "Afficher le nouveau mot de passe"
-                  }
+            {/* IDENTITE */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] md:text-xs text-sbc-muted">
+                  Pièce d’identité
+                </label>
+                <select
+                  name="idType"
+                  value={form.idType}
+                  onChange={handleProfileChange}
+                  className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
                 >
-                  {showNewPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
-                </button>
+                  <option value="">Sélectionnez une pièce</option>
+                  {ID_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Jauge de sécurité */}
-              <div className="mt-2 space-y-1">
-                <div className="w-full h-1.5 rounded-full bg-sbc-bg/80 overflow-hidden">
-                  <div
-                    className={`h-full ${strengthBarClass} transition-all duration-300`}
-                    style={{ width: strengthBarWidth }}
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] md:text-xs text-sbc-muted">
+                  Numéro de la pièce
+                </label>
+                <input
+                  type="text"
+                  name="idNumber"
+                  value={form.idNumber}
+                  onChange={handleProfileChange}
+                  className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                />
+              </div>
+            </div>
+
+            {/* PAIEMENT */}
+            <div className="mt-4 pt-4 border-t border-sbc-border/40">
+              <h3 className="text-[11px] md:text-xs uppercase tracking-[0.18em] text-sbc-gold mb-3">
+                Infos de paiement
+              </h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] md:text-xs text-sbc-muted">
+                    Numéro Wave
+                  </label>
+                  <input
+                    type="tel"
+                    name="waveNumber"
+                    value={form.waveNumber}
+                    onChange={handleProfileChange}
+                    className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
                   />
                 </div>
-                {strengthLabel && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] md:text-xs text-sbc-muted">
+                    Numéro Orange Money
+                  </label>
+                  <input
+                    type="tel"
+                    name="orangeMoneyNumber"
+                    value={form.orangeMoneyNumber}
+                    onChange={handleProfileChange}
+                    className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* LOCALISATION */}
+            <div className="mt-4 pt-4 border-t border-sbc-border/40">
+              <h3 className="text-[11px] md:text-xs uppercase tracking-[0.18em] text-sbc-gold mb-3">
+                Localisation
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] md:text-xs text-sbc-muted">
+                    Pays
+                  </label>
+                  <select
+                    name="country"
+                    value={form.country}
+                    onChange={(e) => {
+                      handleProfileChange(e);
+                      const selected = AFRICA_COUNTRIES.find(
+                        (c) => c.name === e.target.value
+                      );
+                      if (selected) {
+                        setForm((prev) => ({
+                          ...prev,
+                          waveNumber: selected.prefix,
+                          orangeMoneyNumber: selected.prefix,
+                        }));
+                      }
+                    }}
+                    className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                  >
+                    <option value="">Choisissez un pays</option>
+                    {AFRICA_COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.name}>
+                        {c.name} ({c.prefix})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] md:text-xs text-sbc-muted">
+                    Ville
+                  </label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={form.city}
+                    onChange={handleProfileChange}
+                    className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* QUESTION SECURITE */}
+            <div className="mt-4 pt-4 border-t border-sbc-border/40">
+              <h3 className="text-[11px] md:text-xs uppercase tracking-[0.18em] text-sbc-gold mb-3">
+                Question de sécurité
+              </h3>
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] md:text-xs text-sbc-muted">
+                    Question
+                  </label>
+                  <select
+                    name="securityQuestion"
+                    value={form.securityQuestion}
+                    onChange={handleProfileChange}
+                    className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                  >
+                    <option value="">Sélectionnez une question</option>
+                    {SECURITY_QUESTIONS.map((q) => (
+                      <option key={q} value={q}>
+                        {q}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] md:text-xs text-sbc-muted">
+                    Réponse
+                  </label>
+                  <input
+                    type="text"
+                    name="securityAnswer"
+                    value={form.securityAnswer}
+                    onChange={handleProfileChange}
+                    className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                  />
                   <p className="text-[10px] text-sbc-muted">
-                    {strengthLabel}
+                    Stockée de manière sécurisée.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-end">
+              <button
+                type="submit"
+                disabled={savingProfile}
+                className="px-5 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bgSoft text-xs md:text-sm font-semibold transition disabled:opacity-60"
+              >
+                {savingProfile ? "Enregistrement..." : "Enregistrer les modifications"}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        {/* MDP */}
+        <section className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+          <h2 className="text-sm md:text-base font-semibold text-sbc-gold mb-3">
+            Sécurité du compte
+          </h2>
+
+          {errorPassword && (
+            <div className="mb-3 text-[11px] md:text-xs text-red-400 bg-red-950/30 border border-red-700/50 rounded-2xl px-3 py-2">
+              {errorPassword}
+            </div>
+          )}
+          {successPassword && (
+            <div className="mb-3 text-[11px] md:text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/50 rounded-2xl px-3 py-2">
+              {successPassword}
+            </div>
+          )}
+
+          <form
+            onSubmit={handlePasswordSubmit}
+            className="flex flex-col gap-4 md:gap-5"
+          >
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] md:text-xs text-sbc-muted">
+                Mot de passe actuel
+              </label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+              />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Nouveau mot de passe */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] md:text-xs text-sbc-muted">
+                  Nouveau mot de passe
+                </label>
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 pr-9 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword((v) => !v)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
+                    aria-label={
+                      showNewPassword
+                        ? "Masquer le nouveau mot de passe"
+                        : "Afficher le nouveau mot de passe"
+                    }
+                  >
+                    {showNewPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
+                  </button>
+                </div>
+
+                {/* Jauge de sécurité */}
+                <div className="mt-2 space-y-1">
+                  <div className="w-full h-1.5 rounded-full bg-sbc-bg/80 overflow-hidden">
+                    <div
+                      className={`h-full ${strengthBarClass} transition-all duration-300`}
+                      style={{ width: strengthBarWidth }}
+                    />
+                  </div>
+                  {strengthLabel && (
+                    <p className="text-[10px] text-sbc-muted">
+                      {strengthLabel}
+                    </p>
+                  )}
+                </div>
+
+                {/* Checklist dynamique */}
+                <ul className="mt-2 space-y-1 text-[10px] text-sbc-muted">
+                  <li className="flex items-center gap-1">
+                    <span
+                      className={hasLength ? "text-emerald-400" : "text-sbc-muted"}
+                    >
+                      ●
+                    </span>
+                    <span>Au moins 8 caractères</span>
+                  </li>
+                  <li className="flex items-center gap-1">
+                    <span
+                      className={hasLetter ? "text-emerald-400" : "text-sbc-muted"}
+                    >
+                      ●
+                    </span>
+                    <span>Contient des lettres (a–z)</span>
+                  </li>
+                  <li className="flex items-center gap-1">
+                    <span
+                      className={hasNumber ? "text-emerald-400" : "text-sbc-muted"}
+                    >
+                      ●
+                    </span>
+                    <span>Contient des chiffres (0–9)</span>
+                  </li>
+                  <li className="flex items-center gap-1">
+                    <span
+                      className={hasUpper ? "text-emerald-400" : "text-sbc-muted"}
+                    >
+                      ●
+                    </span>
+                    <span>Majuscule recommandée (A–Z)</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Confirmer le mot de passe */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] md:text-xs text-sbc-muted">
+                  Confirmer le mot de passe
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 pr-9 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
+                    aria-label={
+                      showConfirmPassword
+                        ? "Masquer la confirmation"
+                        : "Afficher la confirmation"
+                    }
+                  >
+                    {showConfirmPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
+                  </button>
+                </div>
+                {!passwordsMatch && (
+                  <p className="mt-1 text-[10px] text-red-400">
+                    Les mots de passe ne correspondent pas.
                   </p>
                 )}
               </div>
-
-              {/* Checklist dynamique */}
-              <ul className="mt-2 space-y-1 text-[10px] text-sbc-muted">
-                <li className="flex items-center gap-1">
-                  <span
-                    className={hasLength ? "text-emerald-400" : "text-sbc-muted"}
-                  >
-                    ●
-                  </span>
-                  <span>Au moins 8 caractères</span>
-                </li>
-                <li className="flex items-center gap-1">
-                  <span
-                    className={hasLetter ? "text-emerald-400" : "text-sbc-muted"}
-                  >
-                    ●
-                  </span>
-                  <span>Contient des lettres (a–z)</span>
-                </li>
-                <li className="flex items-center gap-1">
-                  <span
-                    className={hasNumber ? "text-emerald-400" : "text-sbc-muted"}
-                  >
-                    ●
-                  </span>
-                  <span>Contient des chiffres (0–9)</span>
-                </li>
-                <li className="flex items-center gap-1">
-                  <span
-                    className={hasUpper ? "text-emerald-400" : "text-sbc-muted"}
-                  >
-                    ●
-                  </span>
-                  <span>Majuscule recommandée (A–Z)</span>
-                </li>
-              </ul>
             </div>
 
-            {/* Confirmer le mot de passe */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] md:text-xs text-sbc-muted">
-                Confirmer le mot de passe
-              </label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 pr-9 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword((v) => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
-                  aria-label={
-                    showConfirmPassword
-                      ? "Masquer la confirmation"
-                      : "Afficher la confirmation"
-                  }
-                >
-                  {showConfirmPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
-                </button>
-              </div>
-              {!passwordsMatch && (
-                <p className="mt-1 text-[10px] text-red-400">
-                  Les mots de passe ne correspondent pas.
-                </p>
-              )}
+            <div className="mt-2 flex justify-end">
+              <button
+                type="submit"
+                disabled={savingPassword}
+                className="px-5 py-2 rounded-full border border-sbc-gold bg-transparent text-sbc-gold text-xs md:text-sm font-semibold hover:bg-sbc-gold/10 transition disabled:opacity-60"
+              >
+                {savingPassword ? "Mise à jour..." : "Mettre à jour le mot de passe"}
+              </button>
             </div>
-          </div>
-
-          <div className="mt-2 flex justify-end">
-            <button
-              type="submit"
-              disabled={savingPassword}
-              className="px-5 py-2 rounded-full border border-sbc-gold bg-transparent text-sbc-gold text-xs md:text-sm font-semibold hover:bg-sbc-gold/10 transition disabled:opacity-60"
-            >
-              {savingPassword ? "Mise à jour..." : "Mettre à jour le mot de passe"}
-            </button>
-          </div>
-        </form>
-      </section>
-    </div>
+          </form>
+        </section>
+      </div>
+    </main>
   );
 }

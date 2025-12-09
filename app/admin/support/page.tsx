@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import AdminNav from "../AdminNav";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
@@ -193,25 +194,14 @@ export default function AdminSupportPage() {
     new Date(value).toLocaleString("fr-FR");
 
   const renderStatusBadge = (status: string) => {
-    let color = "#555";
-    if (status === "OPEN") color = "#2b8a3e";
-    if (status === "NEEDS_ADMIN") color = "#e67700";
-    if (status === "CLOSED") color = "#495057";
+    let classes =
+      "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium text-white";
+    if (status === "OPEN") classes += " bg-emerald-600";
+    else if (status === "NEEDS_ADMIN") classes += " bg-amber-600";
+    else if (status === "CLOSED") classes += " bg-slate-600";
+    else classes += " bg-sbc-border";
 
-    return (
-      <span
-        style={{
-          display: "inline-block",
-          padding: "2px 8px",
-          borderRadius: "999px",
-          backgroundColor: color,
-          color: "white",
-          fontSize: "12px",
-        }}
-      >
-        {status}
-      </span>
-    );
+    return <span className={classes}>{status}</span>;
   };
 
   const renderSenderLabel = (sender: string) => {
@@ -222,285 +212,240 @@ export default function AdminSupportPage() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-      }}
-    >
-      {/* Colonne gauche : liste des conversations */}
-      <div
-        style={{
-          width: "35%",
-          borderRight: "1px solid #e5e5e5",
-          padding: "16px",
-          overflowY: "auto",
-        }}
-      >
-        <div
-          style={{
-            marginBottom: "12px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <h1 style={{ fontSize: "18px", fontWeight: 600 }}>
-            Support – Conversations
-          </h1>
-          <button
-            onClick={loadConversations}
-            style={{
-              padding: "4px 10px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-              backgroundColor: "#f8f9fa",
-              cursor: "pointer",
-              fontSize: "12px",
-            }}
-          >
-            Actualiser
-          </button>
-        </div>
+    <main className="w-full min-h-screen px-4 sm:px-6 py-8">
+      <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 md:gap-8">
+        {/* NAV ADMIN COMMUN */}
+        <AdminNav />
 
-        {loadingConversations && <p>Chargement des conversations…</p>}
-        {errorConversations && (
-          <p style={{ color: "red" }}>{errorConversations}</p>
-        )}
-
-        {!loadingConversations && !errorConversations && conversations.length === 0 && (
-          <p>Aucune conversation pour le moment.</p>
-        )}
-
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {conversations.map((c) => (
-            <li
-              key={c.id}
-              onClick={() => setSelectedId(c.id)}
-              style={{
-                padding: "10px",
-                marginBottom: "8px",
-                borderRadius: "6px",
-                border:
-                  selectedId === c.id ? "2px solid #228be6" : "1px solid #e5e5e5",
-                backgroundColor:
-                  selectedId === c.id ? "#e7f5ff" : "#ffffff",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
+        {/* CARTE SUPPORT */}
+        <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-7 shadow-[0_22px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg flex flex-col gap-4">
+          {/* Header */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
+                Administration · Support
+              </p>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mt-1">
+                Gestion des conversations clients
+              </h1>
+              <p className="text-xs sm:text-sm text-sbc-muted max-w-2xl leading-relaxed mt-1">
+                Visualisez les échanges avec les clients, répondez à leurs
+                questions et suivez l&apos;état de chaque conversation (ouverte, en
+                attente d&apos;admin, clôturée).
+              </p>
+            </div>
+            <button
+              onClick={loadConversations}
+              className="mt-2 sm:mt-0 inline-flex items-center justify-center px-3 py-1.5 rounded-full border border-sbc-border text-[11px] sm:text-xs text-sbc-muted hover:bg-sbc-bgSoft/80 transition"
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "4px",
-                }}
-              >
-                <strong>{c.user.fullName}</strong>
-                {renderStatusBadge(c.status)}
-              </div>
-              <div style={{ fontSize: "12px", color: "#555" }}>
-                {c.user.phone} {c.user.email ? `· ${c.user.email}` : ""}
-              </div>
-              {c.lastMessage && (
-                <div
-                  style={{
-                    marginTop: "6px",
-                    fontSize: "12px",
-                    color: "#666",
-                    maxHeight: "34px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {c.lastMessage}
-                </div>
-              )}
-              {c.lastMessageAt && (
-                <div
-                  style={{
-                    marginTop: "4px",
-                    fontSize: "11px",
-                    color: "#999",
-                  }}
-                >
-                  Dernier message : {formatDate(c.lastMessageAt)}
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Colonne droite : détails + messages */}
-      <div
-        style={{
-          flex: 1,
-          padding: "16px",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        {!selectedId && (
-          <div
-            style={{
-              margin: "auto",
-              textAlign: "center",
-              color: "#777",
-            }}
-          >
-            <p>Sélectionnez une conversation dans la colonne de gauche.</p>
+              Actualiser les conversations
+            </button>
           </div>
-        )}
 
-        {selectedId && (
-          <>
-            {/* Header conversation */}
-            <div
-              style={{
-                marginBottom: "12px",
-                borderBottom: "1px solid #e5e5e5",
-                paddingBottom: "8px",
-              }}
-            >
-              {conversation ? (
+          {/* Layout 2 colonnes (stack sur mobile) */}
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-5 mt-2">
+            {/* Colonne gauche : liste des conversations */}
+            <div className="w-full lg:w-[36%] flex flex-col gap-3 border border-sbc-border/60 rounded-2xl bg-sbc-bgSoft/60 p-3 sm:p-4 max-h-[520px] lg:max-h-[620px]">
+              <h2 className="text-xs sm:text-sm font-semibold text-sbc-gold">
+                Conversations
+              </h2>
+
+              {loadingConversations && (
+                <p className="text-[11px] sm:text-xs text-sbc-muted">
+                  Chargement des conversations…
+                </p>
+              )}
+
+              {errorConversations && (
+                <p className="text-[11px] sm:text-xs text-red-400">
+                  {errorConversations}
+                </p>
+              )}
+
+              {!loadingConversations &&
+                !errorConversations &&
+                conversations.length === 0 && (
+                  <p className="text-[11px] sm:text-xs text-sbc-muted">
+                    Aucune conversation pour le moment.
+                  </p>
+                )}
+
+              <div className="flex-1 overflow-y-auto space-y-2">
+                {conversations.map((c) => {
+                  const isSelected = selectedId === c.id;
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setSelectedId(c.id)}
+                      className={`w-full text-left rounded-2xl border px-3 py-2 text-xs sm:text-sm transition ${
+                        isSelected
+                          ? "border-sbc-gold bg-sbc-bgSoft"
+                          : "border-sbc-border bg-sbc-bgSoft/30 hover:bg-sbc-bgSoft/60"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <p className="font-semibold text-sbc-text truncate">
+                          {c.user.fullName}
+                        </p>
+                        {renderStatusBadge(c.status)}
+                      </div>
+                      <p className="text-[11px] text-sbc-muted truncate">
+                        {c.user.phone}
+                        {c.user.email ? ` · ${c.user.email}` : ""}
+                      </p>
+                      {c.lastMessage && (
+                        <p className="mt-1 text-[11px] text-sbc-muted line-clamp-2">
+                          {c.lastMessage}
+                        </p>
+                      )}
+                      {c.lastMessageAt && (
+                        <p className="mt-1 text-[10px] text-sbc-muted/70">
+                          Dernier message : {formatDate(c.lastMessageAt)}
+                        </p>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Colonne droite : détails + messages */}
+            <div className="w-full lg:flex-1 flex flex-col border border-sbc-border/60 rounded-2xl bg-sbc-bgSoft/60 p-3 sm:p-4 max-h-[520px] lg:max-h-[620px]">
+              {!selectedId && (
+                <div className="flex flex-1 items-center justify-center">
+                  <p className="text-[11px] sm:text-sm text-sbc-muted text-center">
+                    Sélectionnez une conversation dans la colonne de gauche.
+                  </p>
+                </div>
+              )}
+
+              {selectedId && (
                 <>
-                  <h2 style={{ fontSize: "16px", fontWeight: 600 }}>
-                    Conversation #{conversation.id}
-                  </h2>
-                  <div style={{ fontSize: "14px", marginTop: "4px" }}>
-                    <strong>{conversation.user.fullName}</strong>{" "}
-                    ({conversation.user.phone}
-                    {conversation.user.email
-                      ? ` · ${conversation.user.email}`
-                      : ""}
-                    ){" "}
-                    &nbsp; {renderStatusBadge(conversation.status)}
+                  {/* Header conversation */}
+                  <div className="pb-2 mb-3 border-b border-sbc-border/60">
+                    {conversation ? (
+                      <>
+                        <h2 className="text-sm sm:text-base font-semibold text-sbc-text">
+                          Conversation #{conversation.id}
+                        </h2>
+                        <p className="text-[11px] sm:text-xs text-sbc-muted mt-1">
+                          <span className="font-semibold text-sbc-text">
+                            {conversation.user.fullName}
+                          </span>{" "}
+                          ({conversation.user.phone}
+                          {conversation.user.email
+                            ? ` · ${conversation.user.email}`
+                            : ""}
+                          ){" "}
+                          &nbsp; {renderStatusBadge(conversation.status)}
+                        </p>
+                      </>
+                    ) : (
+                      <h2 className="text-sm sm:text-base font-semibold text-sbc-text">
+                        Conversation #{selectedId}
+                      </h2>
+                    )}
+                  </div>
+
+                  {/* Zone messages */}
+                  <div className="flex-1 border border-sbc-border/60 rounded-2xl bg-sbc-bgSoft/70 px-3 py-2 mb-3 overflow-y-auto space-y-3">
+                    {loadingMessages && (
+                      <p className="text-[11px] sm:text-xs text-sbc-muted">
+                        Chargement des messages…
+                      </p>
+                    )}
+
+                    {errorMessages && (
+                      <p className="text-[11px] sm:text-xs text-red-400">
+                        {errorMessages}
+                      </p>
+                    )}
+
+                    {!loadingMessages &&
+                      !errorMessages &&
+                      messages.length === 0 && (
+                        <p className="text-[11px] sm:text-xs text-sbc-muted">
+                          Aucun message dans cette conversation.
+                        </p>
+                      )}
+
+                    {messages.map((m) => {
+                      const isAdmin = m.sender === "ADMIN";
+                      const isBot = m.sender === "BOT";
+
+                      let bubbleClasses =
+                        "inline-flex flex-col max-w-[85%] rounded-2xl px-3 py-2 text-xs sm:text-sm whitespace-pre-wrap";
+                      if (isAdmin) {
+                        bubbleClasses +=
+                          " bg-sbc-gold text-sbc-bg shadow-[0_10px_30px_rgba(0,0,0,0.7)]";
+                      } else if (isBot) {
+                        bubbleClasses +=
+                          " bg-amber-900/40 text-amber-50 border border-amber-500/40";
+                      } else {
+                        bubbleClasses +=
+                          " bg-sbc-bgSoft text-sbc-text border border-sbc-border/60";
+                      }
+
+                      return (
+                        <div
+                          key={m.id}
+                          className={`flex ${
+                            isAdmin ? "justify-end" : "justify-start"
+                          }`}
+                        >
+                          <div className={bubbleClasses}>
+                            <p className="text-[10px] mb-1 opacity-75">
+                              {renderSenderLabel(m.sender)} ·{" "}
+                              {new Date(m.createdAt).toLocaleString("fr-FR")}
+                            </p>
+                            <p>{m.text}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Zone de réponse */}
+                  <div className="mt-auto">
+                    <label
+                      htmlFor="reply"
+                      className="block text-xs sm:text-sm font-medium text-sbc-muted mb-1"
+                    >
+                      Réponse administrateur
+                    </label>
+
+                    <textarea
+                      id="reply"
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      rows={4}
+                      className="w-full rounded-2xl border border-sbc-border bg-sbc-bg px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold resize-y mb-2"
+                      placeholder="Votre message…"
+                    />
+
+                    {replyError && (
+                      <p className="text-[11px] sm:text-xs text-red-400 mb-2">
+                        {replyError}
+                      </p>
+                    )}
+
+                    <button
+                      onClick={handleSendReply}
+                      disabled={sendingReply || !replyText.trim()}
+                      className="inline-flex items-center px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg text-xs sm:text-sm font-semibold hover:bg-sbc-goldSoft transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {sendingReply
+                        ? "Envoi en cours…"
+                        : "Envoyer la réponse"}
+                    </button>
                   </div>
                 </>
-              ) : (
-                <h2 style={{ fontSize: "16px", fontWeight: 600 }}>
-                  Conversation #{selectedId}
-                </h2>
               )}
             </div>
-
-            {/* Zone messages */}
-            <div
-              style={{
-                flex: 1,
-                border: "1px solid #e5e5e5",
-                borderRadius: "6px",
-                padding: "8px",
-                marginBottom: "12px",
-                overflowY: "auto",
-                backgroundColor: "#f8f9fa",
-              }}
-            >
-              {loadingMessages && <p>Chargement des messages…</p>}
-              {errorMessages && (
-                <p style={{ color: "red" }}>{errorMessages}</p>
-              )}
-              {!loadingMessages && !errorMessages && messages.length === 0 && (
-                <p>Aucun message dans cette conversation.</p>
-              )}
-
-              {messages.map((m) => (
-                <div
-                  key={m.id}
-                  style={{
-                    marginBottom: "10px",
-                    textAlign: m.sender === "ADMIN" ? "right" : "left",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "inline-block",
-                      padding: "6px 10px",
-                      borderRadius: "10px",
-                      backgroundColor:
-                        m.sender === "ADMIN"
-                          ? "#228be6"
-                          : m.sender === "BOT"
-                          ? "#fff3bf"
-                          : "#ffffff",
-                      color: m.sender === "ADMIN" ? "white" : "#222",
-                      maxWidth: "85%",
-                      fontSize: "14px",
-                      whiteSpace: "pre-wrap",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        marginBottom: "2px",
-                        opacity: 0.75,
-                      }}
-                    >
-                      {renderSenderLabel(m.sender)} ·{" "}
-                      {new Date(m.createdAt).toLocaleString("fr-FR")}
-                    </div>
-                    <div>{m.text}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Zone de réponse */}
-            <div>
-              <label
-                htmlFor="reply"
-                style={{ display: "block", marginBottom: "4px", fontSize: "14px" }}
-              >
-                Réponse administrateur
-</label>
-
-<textarea
-  id="reply"
-  value={replyText}
-  onChange={(e) => setReplyText(e.target.value)}
-  rows={4}
-  style={{
-    width: "100%",
-    padding: "8px",
-    borderRadius: "4px",
-    border: "1px solid #1f2937",
-    fontSize: "14px",
-    resize: "vertical",
-    marginBottom: "8px",
-    backgroundColor: "#050812",   // 👈 fond sombre
-    color: "#ffffff",              // 👈 texte blanc
-    outline: "none",
-  }}
-  placeholder="Votre message…"
-/>
-
-{replyError && (
-  <p style={{ color: "red", marginBottom: "6px" }}>{replyError}</p>
-)}
-
-<button
-  onClick={handleSendReply}
-  disabled={sendingReply || !replyText.trim()}
-  style={{
-    padding: "8px 16px",
-    borderRadius: "4px",
-    border: "none",
-    backgroundColor: sendingReply ? "#adb5bd" : "#228be6",
-    color: "white",
-    cursor:
-      sendingReply || !replyText.trim() ? "not-allowed" : "pointer",
-    fontSize: "14px",
-    fontWeight: 500,
-  }}
->
-  {sendingReply ? "Envoi en cours…" : "Envoyer la réponse"}
-</button>
-            </div>
-          </>
-        )}
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

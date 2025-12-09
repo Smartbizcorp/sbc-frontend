@@ -60,8 +60,7 @@ export default function ForgotPasswordSecurityClient() {
     return `${(passwordScore / 4) * 100}%`;
   }, [newPassword, passwordScore]);
 
-  const passwordsMatch =
-    !confirmPassword || newPassword === confirmPassword;
+  const passwordsMatch = !confirmPassword || newPassword === confirmPassword;
 
   // Icônes œil
   const EyeOpenIcon = () => (
@@ -145,7 +144,9 @@ export default function ForgotPasswordSecurityClient() {
     setSuccessMessage("");
 
     if (!securityAnswer.trim()) {
-      setErrorMessage("Merci de renseigner la réponse à la question de sécurité.");
+      setErrorMessage(
+        "Merci de renseigner la réponse à la question de sécurité."
+      );
       setSubmitting(false);
       return;
     }
@@ -204,214 +205,223 @@ export default function ForgotPasswordSecurityClient() {
 
   if (!phone) {
     return (
-      <div className="max-w-md mx-auto text-xs md:text-sm text-red-300">
-        Numéro de téléphone manquant dans l&apos;URL.
-      </div>
+      <main className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-8">
+        <div className="w-full max-w-md mx-auto text-xs sm:text-sm text-red-300 bg-sbc-bgSoft/60 border border-red-700/50 rounded-3xl p-4 shadow-[0_18px_45px_rgba(0,0,0,0.85)]">
+          Numéro de téléphone manquant dans l&apos;URL.
+        </div>
+      </main>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto flex flex-col gap-8">
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-8 shadow">
-        <p className="uppercase text-[11px] tracking-[0.25em] text-sbc-gold">
-          Mot de passe oublié
-        </p>
-        <h1 className="text-2xl md:text-3xl font-semibold mt-2 mb-3">
-          Vérification de sécurité
-        </h1>
-        <p className="text-xs md:text-sm text-sbc-muted leading-relaxed">
-          Répondez à votre question de sécurité puis choisissez un nouveau mot
-          de passe pour votre compte associé au numéro{" "}
-          <span className="text-sbc-gold font-semibold">{phone}</span>.
-        </p>
-      </section>
+    <main className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-8">
+      <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 sm:gap-8">
+        {/* HEADER */}
+        <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
+          <p className="uppercase text-[10px] sm:text-[11px] tracking-[0.25em] text-sbc-gold">
+            Mot de passe oublié
+          </p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mt-2 mb-3">
+            Vérification de sécurité
+          </h1>
+          <p className="text-xs sm:text-sm text-sbc-muted leading-relaxed">
+            Répondez à votre question de sécurité puis choisissez un nouveau mot
+            de passe pour votre compte associé au numéro{" "}
+            <span className="text-sbc-gold font-semibold">{phone}</span>.
+          </p>
+        </section>
 
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-8 shadow">
-        {loadingQuestion ? (
-          <p className="text-xs text-sbc-muted">Chargement de la question...</p>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {errorMessage && (
-              <div className="text-xs text-red-400 bg-red-950/30 border border-red-700/40 rounded-2xl px-3 py-2">
-                {errorMessage}
-              </div>
-            )}
-            {successMessage && (
-              <div className="text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/40 rounded-2xl px-3 py-2">
-                {successMessage}
-              </div>
-            )}
+        {/* FORMULAIRE */}
+        <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
+          {loadingQuestion ? (
+            <p className="text-xs sm:text-sm text-sbc-muted">
+              Chargement de la question...
+            </p>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              {errorMessage && (
+                <div className="text-[11px] sm:text-xs text-red-400 bg-red-950/30 border border-red-700/40 rounded-2xl px-3 py-2">
+                  {errorMessage}
+                </div>
+              )}
+              {successMessage && (
+                <div className="text-[11px] sm:text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/40 rounded-2xl px-3 py-2">
+                  {successMessage}
+                </div>
+              )}
 
-            {/* Question de sécurité */}
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] md:text-xs text-sbc-muted">
-                Question de sécurité
-              </label>
-              <div className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text">
-                {securityQuestion || "Aucune question de sécurité définie."}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] md:text-xs text-sbc-muted">
-                Votre réponse
-              </label>
-              <input
-                type="text"
-                value={securityAnswer}
-                onChange={(e) => setSecurityAnswer(e.target.value)}
-                required
-                className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
-              />
-            </div>
-
-            {/* Nouveau mot de passe + confirmation + jauge */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-sbc-muted mb-1">
-                  Nouveau mot de passe
+              {/* Question de sécurité */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] sm:text-xs text-sbc-muted">
+                  Question de sécurité
                 </label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    required
-                    placeholder="Nouveau mot de passe"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text pr-9"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword((prev) => !prev)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
-                    aria-label={
-                      showNewPassword
-                        ? "Masquer le mot de passe"
-                        : "Afficher le mot de passe"
-                    }
-                  >
-                    {showNewPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
-                  </button>
+                <div className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text">
+                  {securityQuestion || "Aucune question de sécurité définie."}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] sm:text-xs text-sbc-muted">
+                  Votre réponse
+                </label>
+                <input
+                  type="text"
+                  value={securityAnswer}
+                  onChange={(e) => setSecurityAnswer(e.target.value)}
+                  required
+                  className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
+                />
+              </div>
+
+              {/* Nouveau mot de passe + confirmation + jauge */}
+              <div className="grid gap-4 md:grid-cols-2">
+                {/* Nouveau mot de passe */}
+                <div>
+                  <label className="block text-xs font-medium text-sbc-muted mb-1">
+                    Nouveau mot de passe
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      required
+                      placeholder="Nouveau mot de passe"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text pr-9"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword((prev) => !prev)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
+                      aria-label={
+                        showNewPassword
+                          ? "Masquer le mot de passe"
+                          : "Afficher le mot de passe"
+                      }
+                    >
+                      {showNewPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
+                    </button>
+                  </div>
+
+                  {/* Jauge */}
+                  <div className="mt-2 space-y-1">
+                    <div className="w-full h-1.5 rounded-full bg-sbc-bg/80 overflow-hidden">
+                      <div
+                        className={`h-full ${strengthBarClass} transition-all duration-300`}
+                        style={{ width: strengthBarWidth }}
+                      />
+                    </div>
+                    {strengthLabel && (
+                      <p className="text-[10px] text-sbc-muted">
+                        {strengthLabel}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Checklist */}
+                  <ul className="mt-2 space-y-1 text-[10px] text-sbc-muted">
+                    <li className="flex items-center gap-1">
+                      <span
+                        className={
+                          hasLength ? "text-emerald-400" : "text-sbc-muted"
+                        }
+                      >
+                        ●
+                      </span>
+                      <span>Au moins 8 caractères</span>
+                    </li>
+                    <li className="flex items-center gap-1">
+                      <span
+                        className={
+                          hasLetter ? "text-emerald-400" : "text-sbc-muted"
+                        }
+                      >
+                        ●
+                      </span>
+                      <span>Contient des lettres (a–z)</span>
+                    </li>
+                    <li className="flex items-center gap-1">
+                      <span
+                        className={
+                          hasNumber ? "text-emerald-400" : "text-sbc-muted"
+                        }
+                      >
+                        ●
+                      </span>
+                      <span>Contient des chiffres (0–9)</span>
+                    </li>
+                    <li className="flex items-center gap-1">
+                      <span
+                        className={
+                          hasUpper ? "text-emerald-400" : "text-sbc-muted"
+                        }
+                      >
+                        ●
+                      </span>
+                      <span>Majuscule recommandée (A–Z)</span>
+                    </li>
+                  </ul>
                 </div>
 
-                {/* Jauge */}
-                <div className="mt-2 space-y-1">
-                  <div className="w-full h-1.5 rounded-full bg-sbc-bg/80 overflow-hidden">
-                    <div
-                      className={`h-full ${strengthBarClass} transition-all duration-300`}
-                      style={{ width: strengthBarWidth }}
+                {/* Confirmation */}
+                <div>
+                  <label className="block text-xs font-medium text-sbc-muted mb-1">
+                    Confirmer le nouveau mot de passe
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      placeholder="Confirmer le mot de passe"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text pr-9"
                     />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword((prev) => !prev)
+                      }
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
+                      aria-label={
+                        showConfirmPassword
+                          ? "Masquer la confirmation"
+                          : "Afficher la confirmation"
+                      }
+                    >
+                      {showConfirmPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
+                    </button>
                   </div>
-                  {strengthLabel && (
-                    <p className="text-[10px] text-sbc-muted">
-                      {strengthLabel}
+                  {!passwordsMatch && (
+                    <p className="mt-1 text-[10px] text-red-400">
+                      Les mots de passe ne correspondent pas.
                     </p>
                   )}
                 </div>
-
-                {/* Checklist */}
-                <ul className="mt-2 space-y-1 text-[10px] text-sbc-muted">
-                  <li className="flex items-center gap-1">
-                    <span
-                      className={
-                        hasLength ? "text-emerald-400" : "text-sbc-muted"
-                      }
-                    >
-                      ●
-                    </span>
-                    <span>Au moins 8 caractères</span>
-                  </li>
-                  <li className="flex items-center gap-1">
-                    <span
-                      className={
-                        hasLetter ? "text-emerald-400" : "text-sbc-muted"
-                      }
-                    >
-                      ●
-                    </span>
-                    <span>Contient des lettres (a–z)</span>
-                  </li>
-                  <li className="flex items-center gap-1">
-                    <span
-                      className={
-                        hasNumber ? "text-emerald-400" : "text-sbc-muted"
-                      }
-                    >
-                      ●
-                    </span>
-                    <span>Contient des chiffres (0–9)</span>
-                  </li>
-                  <li className="flex items-center gap-1">
-                    <span
-                      className={
-                        hasUpper ? "text-emerald-400" : "text-sbc-muted"
-                      }
-                    >
-                      ●
-                    </span>
-                    <span>Majuscule recommandée (A–Z)</span>
-                  </li>
-                </ul>
               </div>
 
-              {/* Confirmation */}
-              <div>
-                <label className="block text-xs font-medium text-sbc-muted mb-1">
-                  Confirmer le nouveau mot de passe
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    required
-                    placeholder="Confirmer le mot de passe"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text pr-9"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setShowConfirmPassword((prev) => !prev)
-                    }
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
-                    aria-label={
-                      showConfirmPassword
-                        ? "Masquer la confirmation"
-                        : "Afficher la confirmation"
-                    }
-                  >
-                    {showConfirmPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
-                  </button>
-                </div>
-                {!passwordsMatch && (
-                  <p className="mt-1 text-[10px] text-red-400">
-                    Les mots de passe ne correspondent pas.
-                  </p>
-                )}
+              <div className="mt-2 flex flex-col sm:flex-row justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => router.push("/login")}
+                  className="w-full sm:w-auto px-4 py-2 rounded-full border border-sbc-border bg-transparent text-xs sm:text-sm text-sbc-muted hover:bg-sbc-bg/70 transition"
+                >
+                  Retour à la connexion
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full sm:w-auto px-5 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bgSoft text-xs sm:text-sm font-semibold hover:bg-sbc-gold/90 transition disabled:opacity-60"
+                >
+                  {submitting
+                    ? "Réinitialisation..."
+                    : "Réinitialiser le mot de passe"}
+                </button>
               </div>
-            </div>
-
-            <div className="mt-2 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => router.push("/login")}
-                className="px-4 py-2 rounded-full border border-sbc-border bg-transparent text-xs md:text-sm text-sbc-muted hover:bg-sbc-bg/70 transition"
-              >
-                Retour à la connexion
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="px-5 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bgSoft text-xs md:text-sm font-semibold hover:bg-sbc-gold/90 transition disabled:opacity-60"
-              >
-                {submitting
-                  ? "Réinitialisation..."
-                  : "Réinitialiser le mot de passe"}
-              </button>
-            </div>
-          </form>
-        )}
-      </section>
-    </div>
+            </form>
+          )}
+        </section>
+      </div>
+    </main>
   );
 }

@@ -208,25 +208,25 @@ export default function RetraitsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col gap-8 md:gap-10">
+    <div className="w-full max-w-4xl mx-auto px-3 sm:px-0 flex flex-col gap-8 md:gap-10">
       {/* HEADER — identique à la page Investissements */}
-      <section className="flex flex-col md:flex-row md:items-center md:justify-between bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-6 md:p-7 shadow-[0_22px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
+      <section className="flex flex-col md:flex-row md:items-center md:justify-between bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-7 shadow-[0_22px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg gap-4 md:gap-0">
+        <div className="space-y-2">
+          <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
             Retraits
           </p>
 
-          <h1 className="text-2xl md:text-3xl font-semibold mt-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold mt-1">
             Demander un retrait
           </h1>
 
-          <p className="text-xs md:text-sm text-sbc-muted leading-relaxed max-w-2xl mt-2">
+          <p className="text-xs sm:text-sm md:text-sm text-sbc-muted leading-relaxed max-w-2xl mt-1.5">
             Vous pouvez demander un retrait à tout moment. Il sera traité dans
             l’une des fenêtres hebdomadaires prévues par Smart Business Corp.
           </p>
 
           {/* Solde disponible */}
-          <p className="text-[11px] md:text-xs text-sbc-muted mt-3">
+          <p className="text-[10px] sm:text-[11px] md:text-xs text-sbc-muted mt-2">
             Solde disponible :{" "}
             <span className="text-sbc-gold font-semibold">
               {walletBalance !== null
@@ -237,25 +237,25 @@ export default function RetraitsPage() {
         </div>
 
         {/* SECTION COMPTE À DROITE */}
-        <div className="flex flex-col md:items-end mt-4 md:mt-0">
-          <p className="text-xs md:text-sm mb-2 text-sbc-muted">
+        <div className="flex flex-col md:items-end mt-2 md:mt-0 gap-2">
+          <p className="text-[11px] md:text-sm text-sbc-muted">
             Compte :{" "}
             <span className="text-sbc-text font-medium">
               {user ? `${user.fullName} — ${user.phone}` : "Chargement..."}
             </span>
           </p>
 
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <button
               onClick={() => router.push("/dashboard")}
-              className="px-4 py-2 text-[11px] rounded-full border border-sbc-border hover:bg-sbc-bgSoft/40 transition"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-[11px] rounded-full border border-sbc-border hover:bg-sbc-bgSoft/40 transition"
             >
               Dashboard
             </button>
 
             <button
               onClick={logout}
-              className="px-4 py-2 text-[11px] rounded-full border border-red-700 text-red-300 hover:bg-red-900/20 transition"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-[11px] rounded-full border border-red-700 text-red-300 hover:bg-red-900/20 transition"
             >
               Déconnexion
             </button>
@@ -264,24 +264,26 @@ export default function RetraitsPage() {
       </section>
 
       {/* FORMULAIRE */}
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.85)] flex flex-col gap-4">
+      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.85)] flex flex-col gap-4">
         {errorMessage && (
-          <div className="text-[11px] md:text-xs text-red-400 bg-red-950/30 border border-red-700/50 rounded-2xl px-3 py-2">
+          <div className="text-[10px] sm:text-[11px] md:text-xs text-red-400 bg-red-950/30 border border-red-700/50 rounded-2xl px-3 py-2">
             {errorMessage}
           </div>
         )}
 
         {successMessage && (
-          <div className="text-[11px] md:text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/50 rounded-2xl px-3 py-2">
+          <div className="text-[10px] sm:text-[11px] md:text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/50 rounded-2xl px-3 py-2">
             {successMessage}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Montant + Wave */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs text-sbc-muted">Montant *</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] md:text-xs text-sbc-muted">
+                Montant *
+              </label>
               <input
                 type="text"
                 inputMode="numeric"
@@ -293,8 +295,10 @@ export default function RetraitsPage() {
               />
             </div>
 
-            <div>
-              <label className="text-xs text-sbc-muted">Numéro Wave *</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] md:text-xs text-sbc-muted">
+                Numéro Wave *
+              </label>
               <input
                 type="tel"
                 required
@@ -307,8 +311,8 @@ export default function RetraitsPage() {
           </div>
 
           {/* Commentaire */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-sbc-muted">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] md:text-xs text-sbc-muted">
               Commentaire (optionnel)
             </label>
             <textarea
@@ -319,7 +323,7 @@ export default function RetraitsPage() {
             />
           </div>
 
-          <p className="text-[10px] md:text-[11px] text-sbc-muted leading-relaxed">
+          <p className="text-[10px] sm:text-[11px] text-sbc-muted leading-relaxed">
             Les retraits sont traités selon les règles de gestion du risque et
             la liquidité disponible.
           </p>
@@ -327,7 +331,7 @@ export default function RetraitsPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg text-xs md:text-sm font-semibold hover:bg-sbc-goldSoft transition disabled:opacity-60"
+            className="self-start px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg text-xs md:text-sm font-semibold hover:bg-sbc-goldSoft transition disabled:opacity-60"
           >
             {submitting ? "Envoi..." : "Envoyer ma demande"}
           </button>
@@ -335,13 +339,15 @@ export default function RetraitsPage() {
       </section>
 
       {/* HISTORIQUE */}
-      <section className="bg-sbc-bgSoft/50 border border-sbc-border rounded-3xl p-6 md:p-8 shadow-[0_18px_50px_rgba(0,0,0,0.85)] flex flex-col gap-4">
-        <div className="flex justify-between">
+      <section className="bg-sbc-bgSoft/50 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_18px_50px_rgba(0,0,0,0.85)] flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <h2 className="text-sm md:text-base font-semibold text-sbc-gold">
             Historique de vos retraits
           </h2>
           {loading && (
-            <span className="text-[11px] text-sbc-muted">Chargement…</span>
+            <span className="text-[10px] sm:text-[11px] text-sbc-muted">
+              Chargement…
+            </span>
           )}
         </div>
 
@@ -351,7 +357,7 @@ export default function RetraitsPage() {
           </p>
         ) : (
           <div className="overflow-x-auto rounded-2xl border border-sbc-border/70 bg-sbc-bgSoft/30">
-            <table className="w-full text-[11px] md:text-xs text-sbc-muted">
+            <table className="w-full min-w-[480px] text-[10px] sm:text-[11px] md:text-xs text-sbc-muted">
               <thead>
                 <tr className="bg-sbc-bgSoft/70 text-sbc-gold">
                   <th className="p-2 text-left">Date</th>

@@ -141,7 +141,7 @@ export default function RegisterPage() {
         securityAnswer,
       });
 
-      if (!data || (typeof data === "object" && data.success === false)) {
+      if (!data || (typeof data === "object" && (data as any).success === false)) {
         throw new Error(
           (data as any)?.message || "Erreur lors de l'inscription."
         );
@@ -196,41 +196,43 @@ export default function RegisterPage() {
   );
 
   return (
-    <div className="max-w-3xl mx-auto flex flex-col gap-8">
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-8 shadow">
-        <p className="uppercase text-[11px] tracking-[0.25em] text-sbc-gold">
+    <div className="w-full max-w-3xl mx-auto px-3 sm:px-4 md:px-0 flex flex-col gap-6 sm:gap-8 md:gap-10">
+      {/* HEADER / INTRO INSCRIPTION */}
+      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_18px_45px_rgba(0,0,0,0.85)]">
+        <p className="uppercase text-[10px] sm:text-[11px] tracking-[0.25em] text-sbc-gold">
           Inscription
         </p>
-        <h1 className="text-3xl font-semibold mt-2 mb-3">
+        <h1 className="text-2xl sm:text-3xl md:text-[32px] font-semibold mt-2 mb-2 sm:mb-3 leading-snug">
           Créez votre compte Smart Business Corp
         </h1>
-        <p className="text-sm text-sbc-muted leading-relaxed">
+        <p className="text-xs sm:text-sm text-sbc-muted leading-relaxed max-w-xl">
           Inscrivez-vous pour commencer à investir et suivre vos gains.
         </p>
       </section>
 
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-8 shadow">
-        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+      {/* FORMULAIRE INSCRIPTION */}
+      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+        <form className="flex flex-col gap-5 sm:gap-6" onSubmit={handleSubmit}>
           {successMessage && (
-            <div className="text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/40 rounded-2xl px-3 py-2">
+            <div className="text-[10px] sm:text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/40 rounded-2xl px-3 py-2">
               {successMessage}
             </div>
           )}
           {errorMessage && (
-            <div className="text-xs text-red-400 bg-red-950/30 border border-red-700/40 rounded-2xl px-3 py-2">
+            <div className="text-[10px] sm:text-xs text-red-400 bg-red-950/30 border border-red-700/40 rounded-2xl px-3 py-2">
               {errorMessage}
             </div>
           )}
 
           {/* Nom + téléphone */}
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
               required
               placeholder="Nom complet"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
             />
 
             <input
@@ -239,23 +241,24 @@ export default function RegisterPage() {
               placeholder="+221 77 000 00 00"
               value={phone}
               onChange={(e) => setPhone(normalizeSenegalPhone(e.target.value))}
-              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
             />
           </div>
 
+          {/* Email */}
           <input
             type="email"
             placeholder="Adresse email (optionnelle)"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+            className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
           />
 
-          {/* Mot de passe + confirmation + jauge + checklist */}
-          <div className="grid md:grid-cols-2 gap-4">
+          {/* Mot de passe + confirmation + jauge */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Mot de passe */}
             <div>
-              <label className="block text-xs font-medium text-sbc-muted mb-1">
+              <label className="block text-[11px] text-sbc-muted mb-1">
                 Mot de passe
               </label>
               <div className="relative">
@@ -265,7 +268,7 @@ export default function RegisterPage() {
                   placeholder="Mot de passe sécurisé"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text pr-9"
+                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text pr-9 outline-none focus:border-sbc-gold"
                 />
                 <button
                   type="button"
@@ -331,7 +334,7 @@ export default function RegisterPage() {
 
             {/* Confirmer mot de passe */}
             <div>
-              <label className="block text-xs font-medium text-sbc-muted mb-1">
+              <label className="block text-[11px] text-sbc-muted mb-1">
                 Confirmer le mot de passe
               </label>
               <div className="relative">
@@ -341,7 +344,7 @@ export default function RegisterPage() {
                   placeholder="Confirmer le mot de passe"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text pr-9"
+                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text pr-9 outline-none focus:border-sbc-gold"
                 />
                 <button
                   type="button"
@@ -368,7 +371,7 @@ export default function RegisterPage() {
 
           {/* Numéro Wave */}
           <div>
-            <label className="block text-xs font-medium text-sbc-muted mb-1">
+            <label className="block text-[11px] text-sbc-muted mb-1">
               Numéro Wave
             </label>
             <input
@@ -379,26 +382,26 @@ export default function RegisterPage() {
               onChange={(e) =>
                 setWaveNumber(normalizeSenegalPhone(e.target.value))
               }
-              className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+              className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
             />
           </div>
 
           {/* Question de sécurité obligatoire */}
-          <div className="mt-2 pt-2 border-t border-sbc-border/40">
-            <h3 className="text-[11px] uppercase tracking-[0.18em] text-sbc-gold mb-2">
+          <div className="mt-2 pt-3 border-t border-sbc-border/40">
+            <h3 className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-sbc-gold mb-2">
               Question de sécurité (obligatoire)
             </h3>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <div>
-                <label className="block text-xs font-medium text-sbc-muted mb-1">
+                <label className="block text-[11px] text-sbc-muted mb-1">
                   Question
                 </label>
                 <select
                   required
                   value={securityQuestion}
                   onChange={(e) => setSecurityQuestion(e.target.value)}
-                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
                 >
                   <option value="">Sélectionnez une question</option>
                   {SECURITY_QUESTIONS.map((q) => (
@@ -410,7 +413,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-sbc-muted mb-1">
+                <label className="block text-[11px] text-sbc-muted mb-1">
                   Réponse
                 </label>
                 <input
@@ -419,7 +422,7 @@ export default function RegisterPage() {
                   placeholder="Votre réponse (secrète)"
                   value={securityAnswer}
                   onChange={(e) => setSecurityAnswer(e.target.value)}
-                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
+                  className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
                 />
                 <p className="text-[10px] text-sbc-muted mt-1">
                   Cette réponse vous sera demandée en cas de vérification
@@ -429,17 +432,18 @@ export default function RegisterPage() {
             </div>
           </div>
 
+          {/* Bouton & lien login */}
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg font-semibold disabled:opacity-50"
+            className="mt-1 inline-flex items-center justify-center px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg text-xs sm:text-sm font-semibold hover:bg-sbc-goldSoft transition disabled:opacity-50"
           >
             {loading ? "Création..." : "Créer mon compte"}
           </button>
 
           <Link
             href="/login"
-            className="text-xs text-sbc-muted underline hover:text-sbc-gold"
+            className="text-[11px] sm:text-xs text-sbc-muted underline hover:text-sbc-gold mt-1"
           >
             J’ai déjà un compte
           </Link>

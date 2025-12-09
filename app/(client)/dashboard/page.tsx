@@ -145,19 +145,24 @@ export default function DashboardPage() {
     load();
   }, [router]);
 
+  // 💬 États de chargement / erreur avec wrapper responsive
   if (loading) {
     return (
-      <div className="text-xs md:text-sm text-sbc-muted">
-        Chargement de votre espace Smart Business Corp...
-      </div>
+      <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
+        <div className="max-w-4xl mx-auto text-xs md:text-sm text-sbc-muted">
+          Chargement de votre espace Smart Business Corp...
+        </div>
+      </main>
     );
   }
 
   if (errorMessage) {
     return (
-      <div className="max-w-xl mx-auto bg-sbc-bgSoft/60 border border-red-700/50 rounded-3xl p-4 md:p-5 text-[11px] md:text-sm text-red-300 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
-        {errorMessage}
-      </div>
+      <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
+        <div className="max-w-xl mx-auto bg-sbc-bgSoft/60 border border-red-700/50 rounded-3xl p-4 md:p-5 text-[11px] md:text-sm text-red-300 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+          {errorMessage}
+        </div>
+      </main>
     );
   }
 
@@ -231,188 +236,190 @@ export default function DashboardPage() {
       )}
 
       {/* CONTENU DASHBOARD */}
-      <div className="flex flex-col gap-8 md:gap-10">
-        {/* HEADER DASHBOARD */}
-        <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          {/* 🔽 on enlève le rond + le texte "Espace client" */}
-          <div className="flex flex-col gap-2">
-            <h1 className="text-2xl md:text-3xl font-semibold leading-snug">
-              Bonjour,{" "}
-              <span className="text-sbc-gold break-words">
-                {user.fullName}
-              </span>
-            </h1>
-            <p className="text-xs md:text-sm text-sbc-muted max-w-xl leading-relaxed">
-              Sur cet écran, vous retrouvez une vue synthétique de votre
-              portefeuille Smart Business Corp : solde disponible, capital
-              investi, gains cumulés et demandes de retrait.
-            </p>
+      <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
+        <div className="w-full max-w-5xl mx-auto flex flex-col gap-8 md:gap-10">
+          {/* HEADER DASHBOARD */}
+          <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-2xl md:text-3xl font-semibold leading-snug">
+                Bonjour,{" "}
+                <span className="text-sbc-gold break-words">
+                  {user.fullName}
+                </span>
+              </h1>
+              <p className="text-xs md:text-sm text-sbc-muted max-w-xl leading-relaxed">
+                Sur cet écran, vous retrouvez une vue synthétique de votre
+                portefeuille Smart Business Corp : solde disponible, capital
+                investi, gains cumulés et demandes de retrait.
+              </p>
 
-            {/* Badge retraits restants */}
-            <div
-              className={`mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] md:text-xs ${
-                remaining > 0
-                  ? "border-sbc-gold/70 bg-sbc-bgSoft/70"
-                  : "border-red-500/70 bg-red-900/30"
-              }`}
-            >
-              <span
-                className={
-                  remaining > 0 ? "text-sbc-muted" : "text-red-200/80"
-                }
-              >
-                Retraits restants cette semaine :
-              </span>
-              <span
-                className={
+              {/* Badge retraits restants */}
+              <div
+                className={`mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] md:text-xs ${
                   remaining > 0
-                    ? "font-semibold text-sbc-gold"
-                    : "font-semibold text-red-300"
-                }
+                    ? "border-sbc-gold/70 bg-sbc-bgSoft/70"
+                    : "border-red-500/70 bg-red-900/30"
+                }`}
               >
-                {remaining} / {weeklyLimit}
-              </span>
+                <span
+                  className={
+                    remaining > 0 ? "text-sbc-muted" : "text-red-200/80"
+                  }
+                >
+                  Retraits restants cette semaine :
+                </span>
+                <span
+                  className={
+                    remaining > 0
+                      ? "font-semibold text-sbc-gold"
+                      : "font-semibold text-red-300"
+                  }
+                >
+                  {remaining} / {weeklyLimit}
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col items-start md:items-end gap-2 text-xs md:text-sm">
-            <p className="text-sbc-muted">Compte</p>
-            <p className="text-sbc-text break-words">
-              {user.phone}
-              {user.email ? ` · ${user.email}` : ""}
-            </p>
+            <div className="flex flex-col items-start md:items-end gap-2 text-xs md:text-sm">
+              <p className="text-sbc-muted">Compte</p>
+              <p className="text-sbc-text break-words">
+                {user.phone}
+                {user.email ? ` · ${user.email}` : ""}
+              </p>
 
-            <div className="flex flex-wrap gap-2 mt-1">
-              <Link
-                href="/faq"
-                className="text-[11px] md:text-xs text-sbc-muted underline underline-offset-4 hover:text-sbc-gold transition"
+              <div className="flex flex-wrap gap-2 mt-1">
+                <Link
+                  href="/faq"
+                  className="text-[11px] md:text-xs text-sbc-muted underline underline-offset-4 hover:text-sbc-gold transition"
+                >
+                  Voir les règles de fonctionnement
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-1 rounded-full border border-red-500/70 text-[11px] md:text-xs text-red-300 hover:bg-red-900/40 transition"
+                >
+                  Se déconnecter
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* STAT CARDS */}
+          <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-4 md:p-5 shadow-[0_20px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg flex flex-col gap-2"
               >
-                Voir les règles de fonctionnement
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="px-3 py-1 rounded-full border border-red-500/70 text-[11px] md:text-xs text-red-300 hover:bg-red-900/40 transition"
-              >
-                Se déconnecter
-              </button>
-            </div>
-          </div>
-        </section>
+                <p className="text-[11px] uppercase tracking-[0.16em] text-sbc-muted">
+                  {stat.label}
+                </p>
+                <p className="text-lg md:text-xl font-semibold text-sbc-gold">
+                  {stat.value}
+                </p>
+                <p className="text-[11px] text-sbc-muted leading-relaxed">
+                  {stat.sub}
+                </p>
+              </div>
+            ))}
+          </section>
 
-        {/* STAT CARDS */}
-        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-4 md:p-5 shadow-[0_20px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg flex flex-col gap-2"
-            >
-              <p className="text-[11px] uppercase tracking-[0.16em] text-sbc-muted">
-                {stat.label}
-              </p>
-              <p className="text-lg md:text-xl font-semibold text-sbc-gold">
-                {stat.value}
-              </p>
-              <p className="text-[11px] text-sbc-muted leading-relaxed">
-                {stat.sub}
-              </p>
-            </div>
-          ))}
-        </section>
-
-        {/* BLOC ACTIVITÉ / ACTIONS */}
-        <section className="grid grid-cols-1 lg:grid-cols-[3fr,2fr] gap-5">
-          {/* Activité récente */}
-          <div className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <h2 className="text-sm md:text-base font-semibold text-sbc-gold">
-                Activité récente
-              </h2>
-              <span className="text-[11px] text-sbc-muted">
-                {activeInvestmentsCount} investissement(s) actif(s)
-              </span>
-            </div>
-
-            {recentEvents.length === 0 ? (
-              <p className="text-[11px] text-sbc-muted">
-                Aucune activité récente pour le moment.
-              </p>
-            ) : (
-              <ul className="flex flex-col gap-3 text-[11px] text-sbc-muted">
-                {recentEvents.map((event, idx) => (
-                  <li
-                    key={idx}
-                    className="flex justify-between gap-3 border-b border-sbc-border/40 pb-2 last:border-b-0"
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-sbc-text">{event.label}</span>
-                      <span className="text-[10px]">{event.detail}</span>
-                    </div>
-                    <span className="text-[10px] text-sbc-muted whitespace-nowrap">
-                      {new Date(event.date).toLocaleString("fr-FR")}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* Actions rapides */}
-          <div className="flex flex-col gap-4">
-            <div className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 shadow-[0_16px_40px_rgba(0,0,0,0.8)]">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-sbc-gold mb-1">
-                Actions rapides
-              </p>
-              <p className="text-sm md:text-base font-semibold mb-2">
-                Gérer vos flux
-              </p>
-              <p className="text-[11px] text-sbc-muted leading-relaxed mb-3">
-                Demandez un retrait, lancez un nouvel investissement ou
-                consultez l&apos;historique de vos opérations.
-              </p>
-
-              <div className="flex flex-wrap gap-2 text-[11px]">
-                <Link
-                  href="/retraits"
-                  className="px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg font-semibold hover:bg-sbc-goldSoft hover:text-sbc-bg transition"
-                >
-                  Demander un retrait
-                </Link>
-                <Link
-                  href="/retraits"
-                  className="px-4 py-2 rounded-full border border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft transition"
-                >
-                  Historique des retraits
-                </Link>
-                <Link
-                  href="/investir"
-                  className="px-4 py-2 rounded-full border border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft transition"
-                >
-                  Lancer un investissement
-                </Link>
+          {/* BLOC ACTIVITÉ / ACTIONS */}
+          <section className="grid grid-cols-1 lg:grid-cols-[3fr,2fr] gap-5">
+            {/* Activité récente */}
+            <div className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <h2 className="text-sm md:text-base font-semibold text-sbc-gold">
+                  Activité récente
+                </h2>
+                <span className="text-[11px] text-sbc-muted">
+                  {activeInvestmentsCount} investissement(s) actif(s)
+                </span>
               </div>
 
-              <p className="mt-3 text-[10px] text-sbc-muted">
-                Il vous reste{" "}
-                <span className="text-sbc-gold font-semibold">
-                  {remaining} retrait{remaining > 1 ? "s" : ""}{" "}
-                </span>
-                autorisé{remaining > 1 ? "s" : ""} cette semaine.
-              </p>
+              {recentEvents.length === 0 ? (
+                <p className="text-[11px] text-sbc-muted">
+                  Aucune activité récente pour le moment.
+                </p>
+              ) : (
+                <ul className="flex flex-col gap-3 text-[11px] text-sbc-muted">
+                  {recentEvents.map((event, idx) => (
+                    <li
+                      key={idx}
+                      className="flex justify-between gap-3 border-b border-sbc-border/40 pb-2 last:border-b-0"
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-sbc-text">{event.label}</span>
+                        <span className="text-[10px]">{event.detail}</span>
+                      </div>
+                      <span className="text-[10px] text-sbc-muted whitespace-nowrap">
+                        {new Date(event.date).toLocaleString("fr-FR")}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
-            <div className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 shadow-[0_16px_40px_rgba(0,0,0,0.8)] text-[10px] md:text-[11px] text-sbc-muted leading-relaxed">
-              Smart Business Corp applique une stratégie orientée vers la{" "}
-              <span className="text-sbc-gold">
-                protection du capital et l&apos;évitement scrupuleux des pertes
-              </span>
-              , mais tout investissement comporte un risque. Les montants et
-              gains affichés sont des informations indicatives et peuvent
-              évoluer en fonction des conditions de marché et des décisions de
-              gestion.
+            {/* Actions rapides */}
+            <div className="flex flex-col gap-4">
+              <div className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 shadow-[0_16px_40px_rgba(0,0,0,0.8)]">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-sbc-gold mb-1">
+                  Actions rapides
+                </p>
+                <p className="text-sm md:text-base font-semibold mb-2">
+                  Gérer vos flux
+                </p>
+                <p className="text-[11px] text-sbc-muted leading-relaxed mb-3">
+                  Demandez un retrait, lancez un nouvel investissement ou
+                  consultez l&apos;historique de vos opérations.
+                </p>
+
+                <div className="flex flex-wrap gap-2 text-[11px]">
+                  <Link
+                    href="/retraits"
+                    className="px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg font-semibold hover:bg-sbc-goldSoft hover:text-sbc-bg transition"
+                  >
+                    Demander un retrait
+                  </Link>
+                  <Link
+                    href="/retraits"
+                    className="px-4 py-2 rounded-full border border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft transition"
+                  >
+                    Historique des retraits
+                  </Link>
+                  <Link
+                    href="/investir"
+                    className="px-4 py-2 rounded-full border border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft transition"
+                  >
+                    Lancer un investissement
+                  </Link>
+                </div>
+
+                <p className="mt-3 text-[10px] text-sbc-muted">
+                  Il vous reste{" "}
+                  <span className="text-sbc-gold font-semibold">
+                    {remaining} retrait{remaining > 1 ? "s" : ""}{" "}
+                  </span>
+                  autorisé{remaining > 1 ? "s" : ""} cette semaine.
+                </p>
+              </div>
+
+              <div className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 shadow-[0_16px_40px_rgba(0,0,0,0.8)] text-[10px] md:text-[11px] text-sbc-muted leading-relaxed">
+                Smart Business Corp applique une stratégie orientée vers la{" "}
+                <span className="text-sbc-gold">
+                  protection du capital et l&apos;évitement scrupuleux des
+                  pertes
+                </span>
+                , mais tout investissement comporte un risque. Les montants et
+                gains affichés sont des informations indicatives et peuvent
+                évoluer en fonction des conditions de marché et des décisions de
+                gestion.
+              </div>
             </div>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
+      </main>
     </>
   );
 }

@@ -63,45 +63,48 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto flex flex-col gap-6 md:gap-8">
+    <div className="min-h-[calc(100vh-140px)] w-full max-w-3xl mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-10 flex flex-col gap-5 sm:gap-6 md:gap-8">
       {/* Bandeau intro */}
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-8 shadow-[0_25px_60px_rgba(0,0,0,0.9)]">
-        <p className="text-[11px] uppercase tracking-[0.25em] text-sbc-gold mb-2">
+      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_20px_55px_rgba(0,0,0,0.9)]">
+        <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-sbc-gold mb-1.5 sm:mb-2">
           Connexion
         </p>
-        <h1 className="text-3xl font-semibold mb-3">Accédez à votre espace</h1>
-        <p className="text-sm text-sbc-muted leading-relaxed">
+        <h1 className="text-2xl sm:text-3xl font-semibold mb-2 sm:mb-3 leading-snug">
+          Accédez à votre espace
+        </h1>
+        <p className="text-xs sm:text-sm text-sbc-muted leading-relaxed">
           Connectez-vous pour suivre votre portefeuille Smart Business Corp.
         </p>
       </section>
 
       {/* Formulaire */}
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
-        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_18px_50px_rgba(0,0,0,0.85)]">
+        <form className="flex flex-col gap-4 sm:gap-5" onSubmit={handleSubmit}>
           {errorMessage && (
-            <div className="text-xs text-red-400 bg-red-950/30 border border-red-700/50 rounded-2xl px-3 py-2">
+            <div className="text-[11px] sm:text-xs text-red-400 bg-red-950/30 border border-red-700/50 rounded-2xl px-3 py-2">
               {errorMessage}
             </div>
           )}
 
           {/* Téléphone */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-sbc-muted">
-              Téléphone (WhatsApp) <span className="text-sbc-gold">*</span>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] sm:text-xs text-sbc-muted">
+              Téléphone (WhatsApp){" "}
+              <span className="text-sbc-gold">*</span>
             </label>
             <input
               type="tel"
               required
               value={phone}
               onChange={(e) => setPhone(normalizeSenegalPhone(e.target.value))}
-              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text focus:border-sbc-gold"
+              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text focus:border-sbc-gold outline-none"
               placeholder="+221 77 000 00 00"
             />
           </div>
 
           {/* Mot de passe */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-sbc-muted">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] sm:text-xs text-sbc-muted">
               Mot de passe <span className="text-sbc-gold">*</span>
             </label>
             <input
@@ -109,7 +112,7 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text focus:border-sbc-gold"
+              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text focus:border-sbc-gold outline-none"
               placeholder="Votre mot de passe"
             />
           </div>
@@ -117,7 +120,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg font-semibold hover:bg-sbc-goldSoft transition disabled:opacity-60"
+            className="mt-1 px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg text-xs sm:text-sm font-semibold hover:bg-sbc-goldSoft transition disabled:opacity-60"
           >
             {loading ? "Connexion..." : "Se connecter"}
           </button>
@@ -125,7 +128,7 @@ export default function LoginPage() {
           <div className="mt-3 flex flex-col gap-1">
             <Link
               href="/forgot-password"
-              className="text-xs text-sbc-muted underline hover:text-sbc-gold"
+              className="text-[11px] sm:text-xs text-sbc-muted underline hover:text-sbc-gold"
             >
               Mot de passe oublié ?
             </Link>
@@ -133,7 +136,7 @@ export default function LoginPage() {
 
           <Link
             href="/register"
-            className="text-xs text-sbc-muted underline hover:text-sbc-gold mt-2"
+            className="text-[11px] sm:text-xs text-sbc-muted underline hover:text-sbc-gold mt-2"
           >
             Créer un compte
           </Link>

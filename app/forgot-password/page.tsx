@@ -52,61 +52,67 @@ export default function ForgotPasswordPhonePage() {
   };
 
   return (
-    <div className="max-w-md mx-auto flex flex-col gap-6">
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-6 shadow">
-        <p className="uppercase text-[11px] tracking-[0.25em] text-sbc-gold">
-          Mot de passe oublié
-        </p>
-        <h1 className="text-2xl font-semibold mt-2 mb-2">
-          Réinitialiser votre mot de passe
-        </h1>
-        <p className="text-xs md:text-sm text-sbc-muted leading-relaxed">
-          Entrez votre numéro de téléphone utilisé lors de l&apos;inscription.
-          Si un compte existe, vous devrez ensuite répondre à votre question de
-          sécurité.
-        </p>
-      </section>
+    <main className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 py-8">
+      <div className="w-full max-w-md mx-auto flex flex-col gap-6">
+        {/* HEADER */}
+        <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
+          <p className="uppercase text-[10px] sm:text-[11px] tracking-[0.25em] text-sbc-gold">
+            Mot de passe oublié
+          </p>
+          <h1 className="text-xl sm:text-2xl font-semibold mt-2 mb-2">
+            Réinitialiser votre mot de passe
+          </h1>
+          <p className="text-xs sm:text-sm text-sbc-muted leading-relaxed">
+            Entrez votre numéro de téléphone utilisé lors de l&apos;inscription.
+            Si un compte existe, vous devrez ensuite répondre à votre question
+            de sécurité.
+          </p>
+        </section>
 
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-6 shadow">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {errorMessage && (
-            <div className="text-xs text-red-400 bg-red-950/30 border border-red-700/40 rounded-2xl px-3 py-2">
-              {errorMessage}
+        {/* FORMULAIRE */}
+        <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {errorMessage && (
+              <div className="text-[11px] sm:text-xs text-red-400 bg-red-950/30 border border-red-700/40 rounded-2xl px-3 py-2">
+                {errorMessage}
+              </div>
+            )}
+            {infoMessage && (
+              <div className="text-[11px] sm:text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/40 rounded-2xl px-3 py-2">
+                {infoMessage}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] sm:text-xs text-sbc-muted">
+                Numéro de téléphone
+              </label>
+              <input
+                type="tel"
+                required
+                placeholder="+221 77 000 00 00"
+                value={phone}
+                onChange={(e) =>
+                  setPhone(normalizeSenegalPhone(e.target.value))
+                }
+                className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text focus:outline-none focus:ring-1 focus:ring-sbc-gold focus:border-sbc-gold"
+              />
+              <p className="text-[10px] text-sbc-muted mt-1">
+                Nous n&apos;acceptons pour le moment que les numéros au format
+                +221XXXXXXXXX.
+              </p>
             </div>
-          )}
-          {infoMessage && (
-            <div className="text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/40 rounded-2xl px-3 py-2">
-              {infoMessage}
-            </div>
-          )}
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] md:text-xs text-sbc-muted">
-              Numéro de téléphone
-            </label>
-            <input
-              type="tel"
-              required
-              placeholder="+221 77 000 00 00"
-              value={phone}
-              onChange={(e) => setPhone(normalizeSenegalPhone(e.target.value))}
-              className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text"
-            />
-            <p className="text-[10px] text-sbc-muted mt-1">
-              Nous n&apos;acceptons pour le moment que les numéros au format
-              +221XXXXXXXXX.
-            </p>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-2 px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg font-semibold disabled:opacity-50"
-          >
-            {loading ? "Vérification..." : "Suivant"}
-          </button>
-        </form>
-      </section>
-    </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-2 w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg font-semibold text-xs sm:text-sm hover:bg-sbc-goldSoft transition disabled:opacity-50"
+            >
+              {loading ? "Vérification..." : "Suivant"}
+            </button>
+          </form>
+        </section>
+      </div>
+    </main>
   );
 }

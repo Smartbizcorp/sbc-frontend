@@ -13,23 +13,57 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const currentYear = new Date().getFullYear();
+
   return (
     <html lang="fr">
       <body className="min-h-screen bg-sbc-bg text-sbc-text flex flex-col">
-        {/* HEADER GLOBAL */}
+        {/* HEADER GLOBAL (déjà géré en responsive dans ton composant Header) */}
         <Header />
 
         {/* CONTENU GLOBAL (pages publiques) */}
-        <main className="flex-1 px-4 py-4 sm:px-6 md:px-10 lg:px-16">
-          {/* 🔽 on resserre la largeur max ici */}
-          <div className="w-full max-w-5xl mx-auto">
+        <main className="flex-1 w-full">
+          <div
+            className="
+              mx-auto w-full
+              max-w-3xl
+              sm:max-w-4xl
+              lg:max-w-5xl
+              xl:max-w-6xl
+              px-3
+              sm:px-5
+              md:px-8
+              lg:px-12
+              xl:px-16
+              py-4
+              sm:py-6
+              md:py-8
+            "
+          >
             {children}
           </div>
         </main>
 
         {/* FOOTER GLOBAL */}
-        <footer className="border-t border-sbc-border py-3 md:py-4 px-4 text-center text-[10px] md:text-[11px] text-sbc-muted">
-          © {new Date().getFullYear()} Smart Business Corp — Tous droits réservés.
+        <footer
+          className="
+            border-t border-sbc-border
+            px-3
+            sm:px-5
+            md:px-8
+            lg:px-12
+            xl:px-16
+            py-3
+            sm:py-3.5
+            md:py-4
+            text-center
+            text-[10px]
+            sm:text-[10.5px]
+            md:text-[11px]
+            text-sbc-muted
+          "
+        >
+          © {currentYear} Smart Business Corp — Tous droits réservés.
         </footer>
       </body>
     </html>

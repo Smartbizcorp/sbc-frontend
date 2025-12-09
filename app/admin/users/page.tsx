@@ -76,102 +76,105 @@ export default function AdminUsersPage() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-8 md:gap-10">
+    <main className="w-full min-h-screen px-4 sm:px-6 py-8">
+      <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 sm:gap-8 md:gap-10">
+        {/* NAVIGATION ADMIN */}
+        <AdminNav />
 
-      {/* NAVIGATION ADMIN */}
-      <AdminNav />
-
-      {/* HEADER */}
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-6 md:p-7 shadow-[0_22px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg">
-        <p className="text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
-          Administration
-        </p>
-        <h1 className="text-2xl md:text-3xl font-semibold mt-1">
-          Gestion des utilisateurs
-        </h1>
-        <p className="text-xs md:text-sm text-sbc-muted leading-relaxed max-w-2xl mt-2">
-          Liste complète des comptes, données financières agrégées et activité
-          récente des utilisateurs.
-        </p>
-      </section>
-
-      {/* LOADING */}
-      {loading && (
-        <div className="text-xs text-sbc-muted">Chargement…</div>
-      )}
-
-      {/* ERREUR */}
-      {!loading && error && (
-        <div className="bg-red-900/30 border border-red-600/40 rounded-2xl p-4 text-red-300 text-xs shadow">
-          {error}
-        </div>
-      )}
-
-      {/* TABLEAU */}
-      {!loading && !error && (
-        <section className="bg-sbc-bgSoft/50 border border-sbc-border rounded-3xl p-6 md:p-8 shadow-[0_18px_55px_rgba(0,0,0,0.85)]">
-          {users.length === 0 ? (
-            <p className="text-xs text-sbc-muted">
-              Aucun utilisateur enregistré.
-            </p>
-          ) : (
-            <div className="overflow-x-auto rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/30">
-              <table className="w-full text-[11px] md:text-xs text-sbc-muted border-collapse">
-                <thead>
-                  <tr className="bg-sbc-bgSoft/70 text-sbc-gold">
-                    <Th>ID</Th>
-                    <Th>Nom</Th>
-                    <Th>Téléphone</Th>
-                    <Th>Email</Th>
-                    <Th>Rôle</Th>
-                    <Th>Créé le</Th>
-                    <Th>Dernière connexion</Th>
-                    <Th>Investi</Th>
-                    <Th>Gains</Th>
-                    <Th>Retraits traités</Th>
-                    <Th>Solde wallet</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((u) => (
-                    <tr
-                      key={u.id}
-                      className="border-t border-sbc-border/40 hover:bg-sbc-bgSoft/40 transition"
-                    >
-                      <Td>{u.id}</Td>
-                      <Td className="text-sbc-text">{u.fullName}</Td>
-                      <Td>{u.phone}</Td>
-                      <Td>{u.email || "-"}</Td>
-                      <Td>{u.role}</Td>
-                      <Td>
-                        {new Date(u.createdAt).toLocaleDateString("fr-FR")}
-                      </Td>
-                      <Td>
-                        {u.lastSeenAt
-                          ? new Date(u.lastSeenAt).toLocaleString("fr-FR")
-                          : "-"}
-                      </Td>
-                      <Td className="text-sbc-gold font-semibold">
-                        {formatXOF(u.totalInvested)}
-                      </Td>
-                      <Td className="text-sbc-gold font-semibold">
-                        {formatXOF(u.totalGains)}
-                      </Td>
-                      <Td className="text-sbc-gold font-semibold">
-                        {formatXOF(u.totalWithdrawalsProcessed)}
-                      </Td>
-                      <Td className="text-sbc-gold font-semibold">
-                        {formatXOF(u.walletBalance)}
-                      </Td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+        {/* HEADER */}
+        <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-7 shadow-[0_22px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg">
+          <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
+            Administration
+          </p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mt-1">
+            Gestion des utilisateurs
+          </h1>
+          <p className="text-xs sm:text-sm text-sbc-muted leading-relaxed max-w-2xl mt-2">
+            Liste complète des comptes, données financières agrégées et activité
+            récente des utilisateurs.
+          </p>
         </section>
-      )}
-    </div>
+
+        {/* LOADING */}
+        {loading && (
+          <div className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-4 sm:p-5 text-[11px] sm:text-xs text-sbc-muted shadow-[0_18px_45px_rgba(0,0,0,0.85)]">
+            Chargement…
+          </div>
+        )}
+
+        {/* ERREUR */}
+        {!loading && error && (
+          <div className="bg-red-900/30 border border-red-600/40 rounded-2xl p-4 text-red-300 text-[11px] sm:text-xs shadow">
+            {error}
+          </div>
+        )}
+
+        {/* TABLEAU */}
+        {!loading && !error && (
+          <section className="bg-sbc-bgSoft/50 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_18px_55px_rgba(0,0,0,0.85)]">
+            {users.length === 0 ? (
+              <p className="text-[11px] sm:text-xs text-sbc-muted">
+                Aucun utilisateur enregistré.
+              </p>
+            ) : (
+              <div className="w-full overflow-x-auto rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/30">
+                <table className="min-w-[900px] w-full text-[11px] md:text-xs text-sbc-muted border-collapse">
+                  <thead>
+                    <tr className="bg-sbc-bgSoft/70 text-sbc-gold">
+                      <Th>ID</Th>
+                      <Th>Nom</Th>
+                      <Th>Téléphone</Th>
+                      <Th>Email</Th>
+                      <Th>Rôle</Th>
+                      <Th>Créé le</Th>
+                      <Th>Dernière connexion</Th>
+                      <Th>Investi</Th>
+                      <Th>Gains</Th>
+                      <Th>Retraits traités</Th>
+                      <Th>Solde wallet</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((u) => (
+                      <tr
+                        key={u.id}
+                        className="border-t border-sbc-border/40 hover:bg-sbc-bgSoft/40 transition"
+                      >
+                        <Td>{u.id}</Td>
+                        <Td className="text-sbc-text">{u.fullName}</Td>
+                        <Td>{u.phone}</Td>
+                        <Td>{u.email || "-"}</Td>
+                        <Td>{u.role}</Td>
+                        <Td>
+                          {new Date(u.createdAt).toLocaleDateString("fr-FR")}
+                        </Td>
+                        <Td>
+                          {u.lastSeenAt
+                            ? new Date(u.lastSeenAt).toLocaleString("fr-FR")
+                            : "-"}
+                        </Td>
+                        <Td className="text-sbc-gold font-semibold">
+                          {formatXOF(u.totalInvested)}
+                        </Td>
+                        <Td className="text-sbc-gold font-semibold">
+                          {formatXOF(u.totalGains)}
+                        </Td>
+                        <Td className="text-sbc-gold font-semibold">
+                          {formatXOF(u.totalWithdrawalsProcessed)}
+                        </Td>
+                        <Td className="text-sbc-gold font-semibold">
+                          {formatXOF(u.walletBalance)}
+                        </Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+      </div>
+    </main>
   );
 }
 

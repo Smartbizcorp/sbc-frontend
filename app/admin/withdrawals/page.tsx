@@ -44,9 +44,9 @@ export default function AdminWithdrawalsPage() {
   const [withdrawals, setWithdrawals] = useState<AdminWithdrawal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<
-    WithdrawalStatus | "ALL"
-  >("PENDING");
+  const [statusFilter, setStatusFilter] = useState<WithdrawalStatus | "ALL">(
+    "PENDING"
+  );
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
   // 🔐 Vérif ADMIN
@@ -118,163 +118,165 @@ export default function AdminWithdrawalsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-8 md:gap-10">
-      {/* NAVIGATION ADMIN */}
-      <AdminNav />
+    <main className="w-full min-h-screen px-4 sm:px-6 py-8">
+      <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 sm:gap-8 md:gap-10">
+        {/* NAVIGATION ADMIN */}
+        <AdminNav />
 
-      {/* HEADER */}
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-6 md:p-7 shadow-[0_22px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg">
-        <p className="text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
-          Administration
-        </p>
-        <h1 className="text-2xl md:text-3xl font-semibold mt-1">
-          Gestion des retraits
-        </h1>
-        <p className="text-xs md:text-sm text-sbc-muted leading-relaxed max-w-2xl mt-2">
-          Visualisez les demandes de retrait, filtrez par statut et mettez à
-          jour leur état (traité / rejeté).
-        </p>
+        {/* HEADER */}
+        <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-7 shadow-[0_22px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg">
+          <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
+            Administration
+          </p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mt-1">
+            Gestion des retraits
+          </h1>
+          <p className="text-xs sm:text-sm text-sbc-muted leading-relaxed max-w-2xl mt-2">
+            Visualisez les demandes de retrait, filtrez par statut et mettez à
+            jour leur état (traité / rejeté).
+          </p>
 
-        {/* Filtres */}
-        <div className="flex flex-wrap gap-2 mt-4 text-[11px]">
-          {(["PENDING", "PROCESSED", "REJECTED", "ALL"] as const).map((s) => {
-            const isActive = statusFilter === s;
-            const label =
-              s === "ALL"
-                ? "Tous"
-                : STATUS_LABELS[s as WithdrawalStatus];
+          {/* Filtres */}
+          <div className="flex flex-wrap gap-2 mt-4 text-[11px] sm:text-xs">
+            {(["PENDING", "PROCESSED", "REJECTED", "ALL"] as const).map((s) => {
+              const isActive = statusFilter === s;
+              const label =
+                s === "ALL" ? "Tous" : STATUS_LABELS[s as WithdrawalStatus];
 
-            return (
-              <button
-                key={s}
-                onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1 rounded-full border text-[11px] ${
-                  isActive
-                    ? "bg-sbc-gold text-black border-sbc-gold"
-                    : "bg-sbc-bgSoft border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft/70"
-                }`}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* LOADING */}
-      {loading && (
-        <div className="text-xs text-sbc-muted">Chargement…</div>
-      )}
-
-      {/* ERREUR */}
-      {!loading && error && (
-        <div className="bg-red-900/30 border border-red-600/40 rounded-2xl p-4 text-red-300 text-xs shadow">
-          {error}
-        </div>
-      )}
-
-      {/* TABLEAU */}
-      {!loading && !error && (
-        <section className="bg-sbc-bgSoft/50 border border-sbc-border rounded-3xl p-6 md:p-8 shadow-[0_18px_55px_rgba(0,0,0,0.85)]">
-          {withdrawals.length === 0 ? (
-            <p className="text-xs text-sbc-muted">
-              Aucune demande de retrait pour ce filtre.
-            </p>
-          ) : (
-            <div className="overflow-x-auto rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/30">
-              <table className="w-full text-[11px] md:text-xs text-sbc-muted border-collapse">
-                <thead>
-                  <tr className="bg-sbc-bgSoft/70 text-sbc-gold">
-                    <Th>Date</Th>
-                    <Th>Client</Th>
-                    <Th>Téléphone</Th>
-                    <Th>Montant</Th>
-                    <Th>Numéro Wave</Th>
-                    <Th>Statut</Th>
-                    <Th>Actions</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {withdrawals.map((w) => (
-                    <tr
-                      key={w.id}
-                      className="border-t border-sbc-border/40 hover:bg-sbc-bgSoft/40 transition"
-                    >
-                      <Td>
-                        {new Date(w.createdAt).toLocaleString("fr-FR")}
-                      </Td>
-
-                      {/* ⚠️ w.user peut être null → on protège */}
-                      <Td className="text-sbc-text">
-                        {w.user?.fullName ?? "Utilisateur inconnu"}
-                      </Td>
-
-                      <Td>{w.user?.phone ?? "-"}</Td>
-
-                      <Td className="text-sbc-gold font-semibold">
-                        {formatXOF(w.amount)}
-                      </Td>
-
-                      <Td>{w.waveNumber}</Td>
-
-                      <Td>
-                        <span
-                          className={`px-2 py-1 rounded-full text-[10px] uppercase ${
-                            w.status === "PENDING"
-                              ? "bg-yellow-500/10 text-yellow-300 border border-yellow-500/40"
-                              : w.status === "PROCESSED"
-                              ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/40"
-                              : "bg-red-500/10 text-red-300 border border-red-500/40"
-                          }`}
-                        >
-                          {STATUS_LABELS[w.status]}
-                        </span>
-                      </Td>
-
-                      <Td>
-                        <div className="flex gap-2">
-                          {w.status === "PENDING" && (
-                            <>
-                              <button
-                                disabled={actionLoadingId === w.id}
-                                onClick={() =>
-                                  changeStatus(w.id, "PROCESSED")
-                                }
-                                className="px-3 py-1 rounded-full text-[10px] bg-emerald-500 text-black hover:bg-emerald-400 disabled:opacity-50"
-                              >
-                                {actionLoadingId === w.id
-                                  ? "Traitement…"
-                                  : "Marquer traité"}
-                              </button>
-                              <button
-                                disabled={actionLoadingId === w.id}
-                                onClick={() =>
-                                  changeStatus(w.id, "REJECTED")
-                                }
-                                className="px-3 py-1 rounded-full text-[10px] bg-red-500 text-black hover:bg-red-400 disabled:opacity-50"
-                              >
-                                {actionLoadingId === w.id
-                                  ? "Traitement…"
-                                  : "Rejeter"}
-                              </button>
-                            </>
-                          )}
-                          {w.status !== "PENDING" && (
-                            <span className="text-[10px] text-sbc-muted">
-                              Action effectuée
-                            </span>
-                          )}
-                        </div>
-                      </Td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+              return (
+                <button
+                  key={s}
+                  onClick={() => setStatusFilter(s)}
+                  className={`px-3 py-1 rounded-full border transition ${
+                    isActive
+                      ? "bg-sbc-gold text-black border-sbc-gold font-semibold"
+                      : "bg-sbc-bgSoft border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft/70"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </section>
-      )}
-    </div>
+
+        {/* LOADING */}
+        {loading && (
+          <div className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-4 sm:p-5 text-[11px] sm:text-xs text-sbc-muted shadow-[0_18px_45px_rgba(0,0,0,0.85)]">
+            Chargement…
+          </div>
+        )}
+
+        {/* ERREUR */}
+        {!loading && error && (
+          <div className="bg-red-900/30 border border-red-600/40 rounded-2xl p-4 text-red-300 text-[11px] sm:text-xs shadow">
+            {error}
+          </div>
+        )}
+
+        {/* TABLEAU */}
+        {!loading && !error && (
+          <section className="bg-sbc-bgSoft/50 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_18px_55px_rgba(0,0,0,0.85)]">
+            {withdrawals.length === 0 ? (
+              <p className="text-[11px] sm:text-xs text-sbc-muted">
+                Aucune demande de retrait pour ce filtre.
+              </p>
+            ) : (
+              <div className="w-full overflow-x-auto rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/30">
+                <table className="min-w-[900px] w-full text-[11px] md:text-xs text-sbc-muted border-collapse">
+                  <thead>
+                    <tr className="bg-sbc-bgSoft/70 text-sbc-gold">
+                      <Th>Date</Th>
+                      <Th>Client</Th>
+                      <Th>Téléphone</Th>
+                      <Th>Montant</Th>
+                      <Th>Numéro Wave</Th>
+                      <Th>Statut</Th>
+                      <Th>Actions</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {withdrawals.map((w) => (
+                      <tr
+                        key={w.id}
+                        className="border-t border-sbc-border/40 hover:bg-sbc-bgSoft/40 transition"
+                      >
+                        <Td>
+                          {new Date(w.createdAt).toLocaleString("fr-FR")}
+                        </Td>
+
+                        {/* ⚠️ w.user peut être null → on protège */}
+                        <Td className="text-sbc-text">
+                          {w.user?.fullName ?? "Utilisateur inconnu"}
+                        </Td>
+
+                        <Td>{w.user?.phone ?? "-"}</Td>
+
+                        <Td className="text-sbc-gold font-semibold">
+                          {formatXOF(w.amount)}
+                        </Td>
+
+                        <Td>{w.waveNumber}</Td>
+
+                        <Td>
+                          <span
+                            className={`px-2 py-1 rounded-full text-[10px] uppercase ${
+                              w.status === "PENDING"
+                                ? "bg-yellow-500/10 text-yellow-300 border border-yellow-500/40"
+                                : w.status === "PROCESSED"
+                                ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/40"
+                                : "bg-red-500/10 text-red-300 border border-red-500/40"
+                            }`}
+                          >
+                            {STATUS_LABELS[w.status]}
+                          </span>
+                        </Td>
+
+                        <Td>
+                          <div className="flex flex-wrap gap-2">
+                            {w.status === "PENDING" && (
+                              <>
+                                <button
+                                  disabled={actionLoadingId === w.id}
+                                  onClick={() =>
+                                    changeStatus(w.id, "PROCESSED")
+                                  }
+                                  className="px-3 py-1 rounded-full text-[10px] bg-emerald-500 text-black hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {actionLoadingId === w.id
+                                    ? "Traitement…"
+                                    : "Marquer traité"}
+                                </button>
+                                <button
+                                  disabled={actionLoadingId === w.id}
+                                  onClick={() =>
+                                    changeStatus(w.id, "REJECTED")
+                                  }
+                                  className="px-3 py-1 rounded-full text-[10px] bg-red-500 text-black hover:bg-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {actionLoadingId === w.id
+                                    ? "Traitement…"
+                                    : "Rejeter"}
+                                </button>
+                              </>
+                            )}
+                            {w.status !== "PENDING" && (
+                              <span className="text-[10px] text-sbc-muted">
+                                Action effectuée
+                              </span>
+                            )}
+                          </div>
+                        </Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+      </div>
+    </main>
   );
 }
 

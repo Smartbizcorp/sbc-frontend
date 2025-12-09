@@ -2,18 +2,18 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col gap-10 md:gap-14">
+    <div className="flex flex-col gap-8 sm:gap-10 lg:gap-14">
       {/* HERO */}
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-7 md:p-10 shadow-[0_25px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg flex flex-col md:flex-row gap-8 md:items-center">
+      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 lg:p-10 shadow-[0_25px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg flex flex-col lg:flex-row gap-6 lg:gap-8 lg:items-center">
         <div className="flex-1 flex flex-col gap-4">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
+          <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
             Plateforme d&apos;investissement
           </p>
-          <h1 className="text-3xl md:text-4xl font-semibold leading-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold leading-tight">
             Faites travailler votre capital avec{" "}
             <span className="text-sbc-gold">Smart Business Corp</span>
           </h1>
-          <p className="text-sm md:text-base text-sbc-muted leading-relaxed max-w-xl">
+          <p className="text-xs sm:text-sm md:text-base text-sbc-muted leading-relaxed max-w-xl">
             Une approche structurée de l&apos;investissement par paliers, encadrée
             par une équipe de traders expérimentés. Suivi transparent, gestion du
             risque disciplinée et retraits organisés deux fois par semaine.
@@ -34,25 +34,31 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-4 text-[11px] text-sbc-muted">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-[11px] text-sbc-muted">
             <div>
-              <p className="text-sbc-gold font-semibold text-sm">Paliers clairs</p>
+              <p className="text-sbc-gold font-semibold text-sm">
+                Paliers clairs
+              </p>
               <p>De 10 000 à 500 000 XOF.</p>
             </div>
             <div>
-              <p className="text-sbc-gold font-semibold text-sm">Stratégie encadrée</p>
+              <p className="text-sbc-gold font-semibold text-sm">
+                Stratégie encadrée
+              </p>
               <p>Gestion du risque avancée.</p>
             </div>
             <div>
-              <p className="text-sbc-gold font-semibold text-sm">Retraits 2x / semaine</p>
+              <p className="text-sbc-gold font-semibold text-sm">
+                Retraits 2x / semaine
+              </p>
               <p>Fenêtres organisées.</p>
             </div>
           </div>
         </div>
 
         {/* Bloc latéral "Info rapide" */}
-        <div className="flex-1">
-          <div className="bg-sbc-bg/80 border border-sbc-border rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)] flex flex-col gap-4 text-xs md:text-sm">
+        <div className="flex-1 w-full">
+          <div className="bg-sbc-bg/80 border border-sbc-border rounded-3xl p-4 sm:p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)] flex flex-col gap-4 text-xs md:text-sm">
             <p className="text-sbc-gold font-semibold text-sm">
               Investir par paliers, suivre avec sérénité
             </p>
@@ -61,7 +67,7 @@ export default function HomePage() {
               effectuez vos retraits dans des fenêtres dédiées : la mécanique est
               claire, la stratégie est encadrée.
             </p>
-            <div className="grid grid-cols-2 gap-3 text-[11px] text-sbc-muted">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] text-sbc-muted">
               <div className="border border-sbc-border rounded-2xl p-3">
                 <p className="text-sbc-gold font-semibold mb-1">Paliers</p>
                 <p>10 000 · 25 000 · 50 000 XOF</p>
@@ -86,27 +92,33 @@ export default function HomePage() {
       </section>
 
       {/* SECTION "Pourquoi Smart Business Corp ?" */}
-      <section className="flex flex-col gap-5">
-        <h2 className="text-lg md:text-xl font-semibold text-sbc-gold">
+      <section className="flex flex-col gap-4 sm:gap-5">
+        <h2 className="text-base sm:text-lg md:text-xl font-semibold text-sbc-gold">
           Pourquoi choisir Smart Business Corp ?
         </h2>
-        <div className="grid md:grid-cols-3 gap-5 text-xs md:text-sm">
-          <div className="bg-sbc-bgSoft/40 border border-sbc-border rounded-3xl p-5 shadow-[0_15px_40px_rgba(0,0,0,0.7)]">
-            <p className="font-semibold text-sbc-gold mb-1">Approche structurée</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 text-xs md:text-sm">
+          <div className="bg-sbc-bgSoft/40 border border-sbc-border rounded-3xl p-4 md:p-5 shadow-[0_15px_40px_rgba(0,0,0,0.7)]">
+            <p className="font-semibold text-sbc-gold mb-1">
+              Approche structurée
+            </p>
             <p className="text-sbc-muted leading-relaxed">
               Paliers définis, horizon temporel clair, stratégie pensée pour
               éviter la confusion et les décisions impulsives.
             </p>
           </div>
-          <div className="bg-sbc-bgSoft/40 border border-sbc-border rounded-3xl p-5 shadow-[0_15px_40px_rgba(0,0,0,0.7)]">
-            <p className="font-semibold text-sbc-gold mb-1">Gestion du risque</p>
+          <div className="bg-sbc-bgSoft/40 border border-sbc-border rounded-3xl p-4 md:p-5 shadow-[0_15px_40px_rgba(0,0,0,0.7)]">
+            <p className="font-semibold text-sbc-gold mb-1">
+              Gestion du risque
+            </p>
             <p className="text-sbc-muted leading-relaxed">
               Exposition maîtrisée, scénarios prudents, ajustements progressifs
               plutôt que paris agressifs.
             </p>
           </div>
-          <div className="bg-sbc-bgSoft/40 border border-sbc-border rounded-3xl p-5 shadow-[0_15px_40px_rgba(0,0,0,0.7)]">
-            <p className="font-semibold text-sbc-gold mb-1">Suivi transparent</p>
+          <div className="bg-sbc-bgSoft/40 border border-sbc-border rounded-3xl p-4 md:p-5 shadow-[0_15px_40px_rgba(0,0,0,0.7)]">
+            <p className="font-semibold text-sbc-gold mb-1">
+              Suivi transparent
+            </p>
             <p className="text-sbc-muted leading-relaxed">
               Accès permanent à l&apos;évolution de votre portefeuille, retraits encadrés
               et informations claires sur votre situation.
@@ -116,17 +128,17 @@ export default function HomePage() {
       </section>
 
       {/* SECTION TABLEAUX GAINS HEBDO + JOURNALIER */}
-      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-6 md:p-8 shadow-[0_24px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg flex flex-col gap-6">
+      <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_24px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg flex flex-col gap-5 sm:gap-6">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.25em] text-sbc-gold mb-2">
+          <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-sbc-gold mb-2">
             Projection premium
           </p>
 
-          <h2 className="text-lg md:text-xl font-semibold mb-2">
+          <h2 className="text-base sm:text-lg md:text-xl font-semibold mb-2">
             Gains estimés par palier
           </h2>
 
-          <p className="text-[11px] md:text-xs text-sbc-muted leading-relaxed max-w-2xl">
+          <p className="text-[10px] sm:text-[11px] md:text-xs text-sbc-muted leading-relaxed max-w-2xl">
             Modèle basé sur un doublement du capital sur une période de 90 jours.
             Les montants ci-dessous répartissent ce résultat final, d&apos;abord
             par semaine, puis par jour, pour offrir une vision pédagogique de la
@@ -172,7 +184,7 @@ export default function HomePage() {
                   Gains hebdomadaires estimés (total final arrondi)
                 </h3>
                 <div className="overflow-x-auto rounded-2xl border border-sbc-border/50 bg-sbc-bgSoft/40">
-                  <table className="w-full text-[11px] md:text-xs text-sbc-muted border-collapse">
+                  <table className="w-full min-w-[480px] text-[10px] sm:text-[11px] md:text-xs text-sbc-muted border-collapse">
                     <thead>
                       <tr className="bg-sbc-bgSoft/70 text-sbc-gold">
                         <th className="p-2 text-left font-medium">Palier</th>
@@ -211,8 +223,8 @@ export default function HomePage() {
                 <h3 className="text-sm md:text-base font-semibold text-sbc-gold">
                   Projection des gains journaliers
                 </h3>
-                <div className="overflow-x-auto rounded-2xl border border-sbc-border/70 bg-sbc-bgSoft/30 max-w-xl">
-                  <table className="w-full text-[11px] md:text-xs text-sbc-muted border-collapse">
+                <div className="overflow-x-auto rounded-2xl border border-sbc-border/70 bg-sbc-bgSoft/30 max-w-full sm:max-w-xl">
+                  <table className="w-full min-w-[360px] text-[10px] sm:text-[11px] md:text-xs text-sbc-muted border-collapse">
                     <thead>
                       <tr className="bg-sbc-bgSoft/70 text-sbc-gold">
                         <th className="p-2 text-left font-medium">
@@ -243,7 +255,7 @@ export default function HomePage() {
               </div>
 
               {/* COMMENTAIRE EXPLICATIF */}
-              <div className="bg-sbc-bgSoft/30 border border-sbc-border/70 rounded-2xl p-3 md:p-4 text-[10px] md:text-[11px] text-sbc-muted leading-relaxed">
+              <div className="bg-sbc-bgSoft/30 border border-sbc-border/70 rounded-2xl p-3 md:p-4 text-[10px] sm:text-[11px] text-sbc-muted leading-relaxed">
                 Ces projections se basent sur un modèle simple&nbsp;: chaque palier
                 double en 90 jours, soit un rendement théorique de{" "}
                 <span className="text-sbc-gold">100&nbsp;%</span>. Les montants
@@ -260,7 +272,7 @@ export default function HomePage() {
       </section>
 
       {/* SECTION CTA FINALE */}
-      <section className="bg-sbc-bgSoft/50 border border-sbc-border rounded-3xl p-6 md:p-8 shadow-[0_18px_50px_rgba(0,0,0,0.85)] flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <section className="bg-sbc-bgSoft/50 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_18px_50px_rgba(0,0,0,0.85)] flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
         <div className="flex flex-col gap-2">
           <p className="text-sm md:text-base font-semibold">
             Prêt à structurer votre façon d&apos;investir ?
