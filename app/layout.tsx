@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt"; // 👈 NEW
 
 export const metadata: Metadata = {
   title: {
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
     apple: "/favicon.png",
     shortcut: "/favicon.ico",
   },
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({
@@ -31,6 +33,9 @@ export default function RootLayout({
       <body className="min-h-screen bg-sbc-bg text-sbc-text flex flex-col">
         {/* HEADER GLOBAL */}
         <Header />
+
+        {/* POPUP INSTALL PWA */}
+        <PwaInstallPrompt />
 
         {/* CONTENU GLOBAL */}
         <main className="flex-1 w-full">
