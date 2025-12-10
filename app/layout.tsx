@@ -4,8 +4,19 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "Smart Business Corp",
-  description: "Plateforme d'investissement",
+  title: {
+    default: "Smart Business Corp",
+    template: "%s | Smart Business Corp",
+  },
+  description: "Plateforme d'investissement sécurisée et intelligente.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    apple: "/favicon.png",
+    shortcut: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -18,10 +29,10 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="min-h-screen bg-sbc-bg text-sbc-text flex flex-col">
-        {/* HEADER GLOBAL (déjà géré en responsive dans ton composant Header) */}
+        {/* HEADER GLOBAL */}
         <Header />
 
-        {/* CONTENU GLOBAL (pages publiques) */}
+        {/* CONTENU GLOBAL */}
         <main className="flex-1 w-full">
           <div
             className="
