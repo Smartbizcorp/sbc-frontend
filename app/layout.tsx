@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
-import { PwaInstallPrompt } from "@/components/PwaInstallPrompt"; // 👈 NEW
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 
 export const metadata: Metadata = {
   title: {
@@ -13,12 +13,20 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico" },
-      { url: "/favicon.png", type: "image/png" },
+      { url: "/favicon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/favicon-256.png", type: "image/png", sizes: "256x256" },
+      { url: "/favicon-512.png", type: "image/png", sizes: "512x512" },
     ],
-    apple: "/favicon.png",
+    apple: [
+      { url: "/favicon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon-512.png", sizes: "512x512", type: "image/png" },
+    ],
     shortcut: "/favicon.ico",
   },
+  // 🔑 clé PWA : lien vers le manifest
   manifest: "/manifest.webmanifest",
+  // Couleur utilisée par le navigateur pour la barre d’adresse / splash
+  themeColor: "#facc15",
 };
 
 export default function RootLayout({
@@ -31,11 +39,11 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="min-h-screen bg-sbc-bg text-sbc-text flex flex-col">
+        {/* Bannière d’installation PWA (mobile) */}
+        <PwaInstallPrompt />
+
         {/* HEADER GLOBAL */}
         <Header />
-
-        {/* POPUP INSTALL PWA */}
-        <PwaInstallPrompt />
 
         {/* CONTENU GLOBAL */}
         <main className="flex-1 w-full">
