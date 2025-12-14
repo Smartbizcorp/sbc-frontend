@@ -61,10 +61,7 @@ export function Footer() {
               >
                 Qui sommes-nous
               </Link>
-              <Link
-                href="/faq"
-                className="text-sbc-muted hover:text-sbc-gold"
-              >
+              <Link href="/faq" className="text-sbc-muted hover:text-sbc-gold">
                 FAQ &amp; Risques
               </Link>
               <Link
@@ -72,6 +69,23 @@ export function Footer() {
                 className="text-sbc-muted hover:text-sbc-gold"
               >
                 Espace client
+              </Link>
+
+              {/* ✅ Légal */}
+              <Link href="/cgu" className="text-sbc-muted hover:text-sbc-gold">
+                CGU
+              </Link>
+              <Link
+                href="/confidentialite"
+                className="text-sbc-muted hover:text-sbc-gold"
+              >
+                Politique de confidentialité
+              </Link>
+              <Link
+                href="/mentions-legales"
+                className="text-sbc-muted hover:text-sbc-gold"
+              >
+                Mentions légales
               </Link>
             </div>
 
@@ -90,8 +104,7 @@ export function Footer() {
                 </span>
               </p>
               <p className="text-sbc-muted">
-                Moyen de paiement :{" "}
-                <span className="text-sbc-gold">Wave</span>
+                Moyen de paiement : <span className="text-sbc-gold">Wave</span>
               </p>
             </div>
           </div>
@@ -120,10 +133,31 @@ export function Footer() {
             © {new Date().getFullYear()} Smart Business Corp. Tous droits
             réservés.
           </p>
-          <p>
-            L&apos;investissement comporte un risque de perte en capital.
-            Investissez de manière responsable.
-          </p>
+
+          <div className="flex flex-col md:items-end gap-1">
+            <p>
+              L&apos;investissement comporte un risque de perte en capital.
+              Investissez de manière responsable.
+            </p>
+
+            <div className="flex flex-wrap gap-x-3 gap-y-1 justify-center md:justify-end">
+              <Link href="/cgu" className="underline hover:text-sbc-gold">
+                CGU
+              </Link>
+              <Link
+                href="/confidentialite"
+                className="underline hover:text-sbc-gold"
+              >
+                Confidentialité
+              </Link>
+              <Link
+                href="/mentions-legales"
+                className="underline hover:text-sbc-gold"
+              >
+                Mentions légales
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

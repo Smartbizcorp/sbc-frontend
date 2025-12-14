@@ -26,6 +26,8 @@ interface DashboardData {
   }[];
   remainingWithdrawals: number;
   weeklyWithdrawalLimit: number;
+  minDaysRemaining?: number | null;
+  minDaysElapsed?: number | null;
 }
 
 const formatXOF = (amount: number) =>
@@ -134,9 +136,7 @@ export default function DashboardPage() {
         setData(json.data as DashboardData);
       } catch (e: any) {
         console.error(e);
-        setErrorMessage(
-          e.message || "Erreur lors du chargement du dashboard."
-        );
+        setErrorMessage(e.message || "Erreur lors du chargement du dashboard.");
       } finally {
         setLoading(false);
       }
@@ -145,7 +145,7 @@ export default function DashboardPage() {
     load();
   }, [router]);
 
-  // 💬 États de chargement / erreur avec wrapper responsive
+  // 💬 États de chargement / erreur
   if (loading) {
     return (
       <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
@@ -166,9 +166,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!data) {
-    return null;
-  }
+  if (!data) return null;
 
   const {
     user,
@@ -180,6 +178,9 @@ export default function DashboardPage() {
     recentEvents,
     remainingWithdrawals,
     weeklyWithdrawalLimit,
+    // ✅ ajout
+    minDaysRemaining,
+    minDaysElapsed,
   } = data;
 
   const remaining = remainingWithdrawals ?? 0;
@@ -243,10 +244,9 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-2">
               <h1 className="text-2xl md:text-3xl font-semibold leading-snug">
                 Bonjour,{" "}
-                <span className="text-sbc-gold break-words">
-                  {user.fullName}
-                </span>
+                <span className="text-sbc-gold break-words">{user.fullName}</span>
               </h1>
+
               <p className="text-xs md:text-sm text-sbc-muted max-w-xl leading-relaxed">
                 Sur cet écran, vous retrouvez une vue synthétique de votre
                 portefeuille Smart Business Corp : solde disponible, capital
@@ -261,11 +261,7 @@ export default function DashboardPage() {
                     : "border-red-500/70 bg-red-900/30"
                 }`}
               >
-                <span
-                  className={
-                    remaining > 0 ? "text-sbc-muted" : "text-red-200/80"
-                  }
-                >
+                <span className={remaining > 0 ? "text-sbc-muted" : "text-red-200/80"}>
                   Retraits restants cette semaine :
                 </span>
                 <span
@@ -278,6 +274,21 @@ export default function DashboardPage() {
                   {remaining} / {weeklyLimit}
                 </span>
               </div>
+
+              {/* ⏳ Jours restants (compact) */}
+              {typeof minDaysRemaining === "number" && (
+                <div className="mt-1 inline-flex items-center gap-2 rounded-full border border-sbc-border bg-sbc-bgSoft/70 px-3 py-1 text-[11px] md:text-xs">
+                  <span className="text-sbc-muted">Jours restants :</span>
+                  <span className="font-semibold text-sbc-gold">
+                    {minDaysRemaining} / 90
+                  </span>
+                  {typeof minDaysElapsed === "number" && (
+                    <span className="text-sbc-muted">
+                      (écoulés : {minDaysElapsed})
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col items-start md:items-end gap-2 text-xs md:text-sm">
@@ -324,6 +335,101 @@ export default function DashboardPage() {
             ))}
           </section>
 
+          {/* 📊 Investissement en cours – Jours restants */}
+          <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-sbc-gold">
+                  Investissement en cours
+                </p>
+                <h2 className="text-sm md:text-base font-semibold text-sbc-text">
+                  Progression vers l’échéance (90 jours)
+                </h2>
+                <p className="text-[11px] text-sbc-muted leading-relaxed max-w-2xl">
+                  Les gains sont crédités quotidiennement tant que l’investissement est actif.
+                  À l’échéance, l’investissement est clôturé automatiquement et vous recevez une notification.
+                </p>
+              </div>
+
+              <div className="text-right">
+                <p className="text-[10px] text-sbc-muted">Investissements actifs</p>
+                <p className="text-lg md:text-xl font-semibold text-sbc-gold">
+                  {activeInvestmentsCount}
+                </p>
+              </div>
+            </div>
+
+            {activeInvestmentsCount <= 0 || typeof minDaysRemaining !== "number" ? (
+              <div className="mt-4 rounded-2xl border border-sbc-border bg-sbc-bgSoft/70 px-4 py-3 text-[11px] text-sbc-muted">
+                Aucun investissement actif pour le moment.
+              </div>
+            ) : (
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Jours restants */}
+                <div className="rounded-2xl border border-sbc-border bg-sbc-bgSoft/70 px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-sbc-muted">
+                    Jours restants
+                  </p>
+                  <p className="mt-1 text-xl font-semibold text-sbc-gold">
+                    {minDaysRemaining} / 90
+                  </p>
+                  <p className="text-[10px] text-sbc-muted mt-1">
+                    90 − jours écoulés
+                  </p>
+                </div>
+
+                {/* Jours écoulés */}
+                <div className="rounded-2xl border border-sbc-border bg-sbc-bgSoft/70 px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-sbc-muted">
+                    Jours écoulés
+                  </p>
+                  <p className="mt-1 text-xl font-semibold text-sbc-text">
+                    {typeof minDaysElapsed === "number" ? minDaysElapsed : 0} / 90
+                  </p>
+                  <p className="text-[10px] text-sbc-muted mt-1">
+                    Depuis le lancement
+                  </p>
+                </div>
+
+                {/* Statut */}
+                <div className="rounded-2xl border border-sbc-border bg-sbc-bgSoft/70 px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-sbc-muted">
+                    Statut
+                  </p>
+
+                  {minDaysRemaining === 0 ? (
+                    <>
+                      <p className="mt-1 text-sm font-semibold text-red-300">
+                        Arrivé à échéance
+                      </p>
+                      <p className="text-[10px] text-sbc-muted mt-1">
+                        Une notification “échéance” sera visible dans Activité récente.
+                      </p>
+                    </>
+                  ) : minDaysRemaining <= 3 ? (
+                    <>
+                      <p className="mt-1 text-sm font-semibold text-amber-300">
+                        Échéance proche
+                      </p>
+                      <p className="text-[10px] text-sbc-muted mt-1">
+                        Plus que {minDaysRemaining} jour{minDaysRemaining > 1 ? "s" : ""}.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="mt-1 text-sm font-semibold text-emerald-300">
+                        En cours
+                      </p>
+                      <p className="text-[10px] text-sbc-muted mt-1">
+                        Crédit quotidien automatique.
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </section>
+
           {/* BLOC ACTIVITÉ / ACTIONS */}
           <section className="grid grid-cols-1 lg:grid-cols-[3fr,2fr] gap-5">
             {/* Activité récente */}
@@ -349,9 +455,22 @@ export default function DashboardPage() {
                       className="flex justify-between gap-3 border-b border-sbc-border/40 pb-2 last:border-b-0"
                     >
                       <div className="flex flex-col">
-                        <span className="text-sbc-text">{event.label}</span>
-                        <span className="text-[10px]">{event.detail}</span>
+                        <span className="flex items-center gap-2 text-sbc-text">
+                          {event.label}
+
+                          {/* 🔔 Badge spécial échéance J+90 */}
+                          {event.label?.toLowerCase().includes("échéance") && (
+                            <span className="px-2 py-0.5 rounded-full border border-sbc-gold/70 bg-sbc-bgSoft text-[9px] font-semibold text-sbc-gold uppercase tracking-wide">
+                              Échéance
+                            </span>
+                          )}
+                        </span>
+
+                        <span className="text-[10px] text-sbc-muted">
+                          {event.detail}
+                        </span>
                       </div>
+
                       <span className="text-[10px] text-sbc-muted whitespace-nowrap">
                         {new Date(event.date).toLocaleString("fr-FR")}
                       </span>
@@ -408,8 +527,7 @@ export default function DashboardPage() {
               <div className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 shadow-[0_16px_40px_rgba(0,0,0,0.8)] text-[10px] md:text-[11px] text-sbc-muted leading-relaxed">
                 Smart Business Corp applique une stratégie orientée vers la{" "}
                 <span className="text-sbc-gold">
-                  protection du capital et l&apos;évitement scrupuleux des
-                  pertes
+                  protection du capital et l&apos;évitement scrupuleux des pertes
                 </span>
                 , mais tout investissement comporte un risque. Les montants et
                 gains affichés sont des informations indicatives et peuvent

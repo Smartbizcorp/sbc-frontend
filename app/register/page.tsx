@@ -18,6 +18,31 @@ const SECURITY_QUESTIONS = [
   "Titre du premier film vu au cinéma",
 ] as const;
 
+// 🧾 Contenu CGU (à remplacer par ton texte réel ou un résumé + lien)
+const CGU_CONTENT = `
+Conditions Générales d’Utilisation — Smart Business Corp
+
+1) Objet
+Ces CGU encadrent l’accès et l’utilisation de la plateforme Smart Business Corp.
+
+2) Accès au service
+L’accès peut être limité selon les vagues d’inscription et les critères d’éligibilité.
+
+3) Sécurité & Compte
+Vous êtes responsable de la confidentialité de votre mot de passe et de vos informations.
+
+4) Retraits
+Les retraits peuvent être limités et soumis aux règles affichées sur la plateforme.
+
+5) Données personnelles
+Les données sont traitées conformément à notre politique de confidentialité.
+
+6) Acceptation
+En cochant la case, vous acceptez l’intégralité des CGU.
+
+(Version courte — remplace ce texte par tes CGU complètes.)
+`.trim();
+
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -32,6 +57,10 @@ export default function RegisterPage() {
   // 🔐 Question de sécurité
   const [securityQuestion, setSecurityQuestion] = useState("");
   const [securityAnswer, setSecurityAnswer] = useState("");
+
+  // ✅ CGU
+  const [acceptCgu, setAcceptCgu] = useState(false);
+  const [showCguModal, setShowCguModal] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -129,6 +158,15 @@ export default function RegisterPage() {
       return;
     }
 
+    // ✅ CGU obligatoire
+    if (!acceptCgu) {
+      setErrorMessage(
+        "Veuillez accepter les Conditions Générales d’Utilisation (CGU) pour continuer."
+      );
+      setLoading(false);
+      return;
+    }
+
     try {
       // On passe par lib/api.ts → POST /api/register
       const data = await apiRegister({
@@ -139,12 +177,15 @@ export default function RegisterPage() {
         password,
         securityQuestion,
         securityAnswer,
-      });
+        // Si ton backend ne le prend pas, tu peux retirer cette ligne.
+        acceptCgu,
+      } as any);
 
-      if (!data || (typeof data === "object" && (data as any).success === false)) {
-        throw new Error(
-          (data as any)?.message || "Erreur lors de l'inscription."
-        );
+      if (
+        !data ||
+        (typeof data === "object" && (data as any).success === false)
+      ) {
+        throw new Error((data as any)?.message || "Erreur lors de l'inscription.");
       }
 
       setSuccessMessage("Compte créé ! Vous pouvez vous connecter.");
@@ -156,6 +197,7 @@ export default function RegisterPage() {
       setConfirmPassword("");
       setSecurityQuestion("");
       setSecurityAnswer("");
+      setAcceptCgu(false);
     } catch (err: any) {
       setErrorMessage(err.message || "Erreur lors de l'inscription.");
     } finally {
@@ -275,7 +317,9 @@ export default function RegisterPage() {
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
                   aria-label={
-                    showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"
+                    showPassword
+                      ? "Masquer le mot de passe"
+                      : "Afficher le mot de passe"
                   }
                 >
                   {showPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
@@ -348,9 +392,7 @@ export default function RegisterPage() {
                 />
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowConfirmPassword((prev) => !prev)
-                  }
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
                   aria-label={
                     showConfirmPassword
@@ -379,9 +421,7 @@ export default function RegisterPage() {
               required
               placeholder="Numéro Wave (+221...)"
               value={waveNumber}
-              onChange={(e) =>
-                setWaveNumber(normalizeSenegalPhone(e.target.value))
-              }
+              onChange={(e) => setWaveNumber(normalizeSenegalPhone(e.target.value))}
               className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
             />
           </div>
@@ -425,10 +465,34 @@ export default function RegisterPage() {
                   className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
                 />
                 <p className="text-[10px] text-sbc-muted mt-1">
-                  Cette réponse vous sera demandée en cas de vérification
-                  de sécurité.
+                  Cette réponse vous sera demandée en cas de vérification de sécurité.
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* ✅ CGU obligatoire */}
+          <div className="mt-2 pt-3 border-t border-sbc-border/40">
+            <div className="flex items-start gap-3">
+              <input
+                id="acceptCgu"
+                type="checkbox"
+                checked={acceptCgu}
+                onChange={(e) => setAcceptCgu(e.target.checked)}
+                className="mt-1 h-4 w-4 accent-sbc-gold"
+                required
+              />
+              <label htmlFor="acceptCgu" className="text-[11px] sm:text-xs text-sbc-muted leading-relaxed">
+                J’ai lu et j’accepte les{" "}
+                <button
+                  type="button"
+                  onClick={() => setShowCguModal(true)}
+                  className="underline hover:text-sbc-gold text-sbc-text"
+                >
+                  Conditions Générales d’Utilisation (CGU)
+                </button>
+                .
+              </label>
             </div>
           </div>
 
@@ -449,6 +513,77 @@ export default function RegisterPage() {
           </Link>
         </form>
       </section>
+
+      {/* 🧾 MODALE CGU */}
+      {showCguModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Conditions Générales d’Utilisation"
+          onClick={() => setShowCguModal(false)}
+        >
+          <div
+            className="w-full max-w-2xl rounded-3xl border border-sbc-border bg-sbc-bgSoft shadow-[0_25px_70px_rgba(0,0,0,0.95)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-sbc-border/50">
+              <div>
+                <p className="uppercase text-[10px] tracking-[0.25em] text-sbc-gold">
+                  CGU
+                </p>
+                <h3 className="text-base sm:text-lg font-semibold">
+                  Conditions Générales d’Utilisation
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCguModal(false)}
+                className="rounded-full border border-sbc-border px-3 py-1 text-xs text-sbc-muted hover:text-sbc-gold hover:border-sbc-gold transition"
+              >
+                Fermer
+              </button>
+            </div>
+
+            <Link href="/cgu" className="underline hover:text-sbc-gold">
+  lire les CGU
+</Link>
+
+
+            <div className="px-5 sm:px-6 py-4 max-h-[65vh] overflow-auto">
+              <pre className="whitespace-pre-wrap text-[11px] sm:text-xs text-sbc-muted leading-relaxed">
+                {CGU_CONTENT}
+              </pre>
+
+              <div className="mt-4 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCguModal(false)}
+                  className="rounded-full border border-sbc-border px-4 py-2 text-xs sm:text-sm text-sbc-text hover:border-sbc-gold hover:text-sbc-gold transition"
+                >
+                  Retour
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAcceptCgu(true);
+                    setShowCguModal(false);
+                  }}
+                  className="rounded-full border border-sbc-gold bg-sbc-gold px-4 py-2 text-xs sm:text-sm font-semibold text-sbc-bg hover:bg-sbc-goldSoft transition"
+                >
+                  J’accepte
+                </button>
+              </div>
+
+              {/* Alternative: lien vers une page dédiée */}
+              <p className="mt-4 text-[10px] text-sbc-muted">
+                Option recommandée : publier aussi une page dédiée{" "}
+                <span className="text-sbc-text">/cgu</span> pour le SEO et la preuve d’accès.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -34,6 +34,7 @@ async function apiRequest<T = any>(
 
   let data: ApiErrorShape | any = null;
   try {
+    // Certaines réponses (204, etc.) n'ont pas de JSON
     data = await res.json();
   } catch {
     data = null;
@@ -60,39 +61,68 @@ export function apiGet<T = any>(path: string): Promise<T> {
 export function apiPost<T = any>(path: string, body?: unknown): Promise<T> {
   return apiRequest<T>(path, {
     method: "POST",
-    body: body ? JSON.stringify(body) : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 }
 
 export function apiPatch<T = any>(path: string, body?: unknown): Promise<T> {
   return apiRequest<T>(path, {
     method: "PATCH",
-    body: body ? JSON.stringify(body) : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 }
 
 export function apiDelete<T = any>(path: string, body?: unknown): Promise<T> {
   return apiRequest<T>(path, {
     method: "DELETE",
-    body: body ? JSON.stringify(body) : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 }
 
 /* ===================================================== */
+/*  Types                                                */
+/* ===================================================== */
+
+export type RegisterInput = {
+  fullName: string;
+  phone: string;
+  email?: string; // optionnel
+  waveNumber: string;
+  password: string;
+
+  // 🔐 sécurité
+  securityQuestion: string;
+  securityAnswer: string;
+
+  // ✅ CGU obligatoire
+  acceptCgu: true; // important: le backend attend literal true
+};
+
+export type RegisterResponse =
+  | { success: true; userId: number }
+  | { success: false; message?: string };
+
+export type LoginInput = { phone: string; password: string };
+
+export type LoginResponse =
+  | {
+      success: true;
+      user: { id: number; fullName: string; phone: string; role: string };
+    }
+  | { success: false; message?: string };
+
+/* ===================================================== */
 /*  Helpers “haut niveau” (auth + investissements)       */
-/*  → adaptent aux routes de ton backend Express         */
 /* ===================================================== */
 
 // 🔐 REGISTER  → POST /api/register
-// Tu peux passer tous les champs requis (fullName, phone, waveNumber, password, etc.)
-export function register(input: any) {
-  return apiPost("/api/register", input);
+export function register(input: RegisterInput) {
+  return apiPost<RegisterResponse>("/api/register", input);
 }
 
 // 🔐 LOGIN  → POST /api/login
-// Le backend attend { phone, password }
-export function login(input: { phone: string; password: string }) {
-  return apiPost("/api/login", input);
+export function login(input: LoginInput) {
+  return apiPost<LoginResponse>("/api/login", input);
 }
 
 // 🔐 LOGOUT  → POST /api/logout
@@ -111,7 +141,6 @@ export function getMyInvestments() {
 }
 
 // 🚀 Créer un investissement  → POST /api/investments
-// amountXOF doit être l’un des paliers autorisés
 export function createInvestment(amountXOF: number) {
   return apiPost("/api/investments", { amountXOF });
 }
