@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
+import { Analytics } from "@vercel/analytics/react";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 
 export const metadata: Metadata = {
@@ -23,9 +24,7 @@ export const metadata: Metadata = {
     ],
     shortcut: "/favicon.ico",
   },
-  // 🔑 clé PWA : lien vers le manifest
   manifest: "/manifest.webmanifest",
-  // Couleur utilisée par le navigateur pour la barre d’adresse / splash
   themeColor: "#facc15",
 };
 
@@ -39,13 +38,13 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="min-h-screen bg-sbc-bg text-sbc-text flex flex-col">
-        {/* Bannière d’installation PWA (mobile) */}
+        {/* 🔔 Bannière d’installation PWA */}
         <PwaInstallPrompt />
 
-        {/* HEADER GLOBAL */}
+        {/* 🔝 Header global */}
         <Header />
 
-        {/* CONTENU GLOBAL */}
+        {/* 📦 Contenu principal */}
         <main className="flex-1 w-full">
           <div
             className="
@@ -68,7 +67,7 @@ export default function RootLayout({
           </div>
         </main>
 
-        {/* FOOTER GLOBAL */}
+        {/* 🧾 Footer */}
         <footer
           className="
             border-t border-sbc-border
@@ -89,6 +88,9 @@ export default function RootLayout({
         >
           © {currentYear} Smart Business Corp — Tous droits réservés.
         </footer>
+
+        {/* 📊 Vercel Web Analytics */}
+        <Analytics />
       </body>
     </html>
   );
