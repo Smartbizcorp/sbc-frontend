@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminNav from "../AdminNav";
-import { apiGet } from "@/src/api/client";
+import { apiGet, downloadCguProofPdf } from "@/lib/api";
 
 type RecentLedgerEntry = {
   id: number;
@@ -31,8 +31,26 @@ type AdminDashboardResponse = {
     totalWithdrawalsProcessed: number;
     totalWithdrawalsPending: number;
     recentLedger: RecentLedgerEntry[];
-    pendingInvestmentsCount: number; // 🔥 nouveau
+    pendingInvestmentsCount: number;
   };
+};
+
+type CguAcceptance = {
+  id: number;
+  fullName: string;
+  phone: string;
+  email: string | null;
+  acceptCguAt: string | null;
+  cguVersion: string | null;
+  cguHash: string | null;
+  cguIp: string | null;
+  cguUserAgent: string | null;
+  createdAt: string;
+};
+
+type AdminCguAcceptancesResponse = {
+  success: boolean;
+  data: CguAcceptance[];
 };
 
 const formatXOF = (n: number) =>
@@ -40,10 +58,14 @@ const formatXOF = (n: number) =>
 
 export default function AdminDashboardPage() {
   const router = useRouter();
-  const [data, setData] =
-    useState<AdminDashboardResponse["data"] | null>(null);
+  const [data, setData] = useState<AdminDashboardResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // ✅ preuves CGU
+  const [cgu, setCgu] = useState<CguAcceptance[]>([]);
+  const [cguLoading, setCguLoading] = useState(false);
+  const [cguError, setCguError] = useState<string | null>(null);
 
   // 🔐 Vérif simple côté client : admin uniquement
   useEffect(() => {
@@ -64,23 +86,19 @@ export default function AdminDashboardPage() {
     }
   }, [router]);
 
-  // 🔁 Chargement API
+  // 🔁 Chargement dashboard admin
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const res = await apiGet<AdminDashboardResponse>(
-          "/api/admin/dashboard"
-        );
+        const res = await apiGet<AdminDashboardResponse>("/api/admin/dashboard");
         if (!res.success) throw new Error("Réponse API non réussie.");
         setData(res.data);
       } catch (err: any) {
         console.error("Erreur chargement admin dashboard:", err);
-        setError(
-          err.message || "Erreur lors du chargement du dashboard admin."
-        );
+        setError(err.message || "Erreur lors du chargement du dashboard admin.");
       } finally {
         setLoading(false);
       }
@@ -88,10 +106,31 @@ export default function AdminDashboardPage() {
     load();
   }, []);
 
+  // 🔁 Chargement preuves CGU
+  useEffect(() => {
+    const loadCgu = async () => {
+      try {
+        setCguLoading(true);
+        setCguError(null);
+
+        const res = await apiGet<AdminCguAcceptancesResponse>(
+          "/api/admin/cgu-acceptances"
+        );
+        if (!res.success) throw new Error("Réponse CGU non réussie.");
+        setCgu(res.data || []);
+      } catch (err: any) {
+        console.error("Erreur chargement preuves CGU:", err);
+        setCguError(err.message || "Erreur lors du chargement des preuves CGU.");
+      } finally {
+        setCguLoading(false);
+      }
+    };
+    loadCgu();
+  }, []);
+
   return (
     <main className="w-full min-h-screen px-4 sm:px-6 py-8">
       <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 sm:gap-8 md:gap-10">
-        {/* 🔹 MINI-MENU ADMIN COMMUN */}
         <AdminNav />
 
         {/* 🔹 EN-TÊTE */}
@@ -104,7 +143,7 @@ export default function AdminDashboardPage() {
           </h1>
           <p className="text-xs sm:text-sm text-sbc-muted max-w-2xl leading-relaxed">
             Aperçu global : utilisateurs, investissements, retraits, mouvements
-            comptables récents.
+            comptables récents + preuves CGU.
           </p>
         </section>
 
@@ -128,35 +167,13 @@ export default function AdminDashboardPage() {
             {/* 🔹 CARTES STATISTIQUES */}
             <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
               <StatCard label="Utilisateurs" value={data.totalUsers} />
-              <StatCard
-                label="Capital investi"
-                value={formatXOF(data.totalInvested)}
-              />
-              <StatCard
-                label="Gains cumulés"
-                value={formatXOF(data.totalAccruedGain)}
-              />
-              <StatCard
-                label="Solde total wallets"
-                value={formatXOF(data.totalWalletBalance)}
-              />
-              <StatCard
-                label="Total retraits"
-                value={formatXOF(data.totalWithdrawalsAmount)}
-              />
-              <StatCard
-                label="Retraits traités"
-                value={formatXOF(data.totalWithdrawalsProcessed)}
-              />
-              <StatCard
-                label="Retraits en attente"
-                value={formatXOF(data.totalWithdrawalsPending)}
-              />
-              {/* 🔥 nouvelle carte */}
-              <StatCard
-                label="Investissements en attente"
-                value={data.pendingInvestmentsCount}
-              />
+              <StatCard label="Capital investi" value={formatXOF(data.totalInvested)} />
+              <StatCard label="Gains cumulés" value={formatXOF(data.totalAccruedGain)} />
+              <StatCard label="Solde total wallets" value={formatXOF(data.totalWalletBalance)} />
+              <StatCard label="Total retraits" value={formatXOF(data.totalWithdrawalsAmount)} />
+              <StatCard label="Retraits traités" value={formatXOF(data.totalWithdrawalsProcessed)} />
+              <StatCard label="Retraits en attente" value={formatXOF(data.totalWithdrawalsPending)} />
+              <StatCard label="Investissements en attente" value={data.pendingInvestmentsCount} />
             </section>
 
             {/* 🔹 JOURNAL DES MOUVEMENTS */}
@@ -189,9 +206,7 @@ export default function AdminDashboardPage() {
                           key={e.id}
                           className="border-t border-sbc-border/40 hover:bg-sbc-bgSoft/40 transition"
                         >
-                          <Td>
-                            {new Date(e.createdAt).toLocaleString("fr-FR")}
-                          </Td>
+                          <Td>{new Date(e.createdAt).toLocaleString("fr-FR")}</Td>
                           <Td className="text-sbc-text">{e.user.fullName}</Td>
                           <Td>{e.user.phone}</Td>
                           <Td>
@@ -205,11 +220,87 @@ export default function AdminDashboardPage() {
                               {e.type}
                             </span>
                           </Td>
-                          <Td className="text-sbc-gold font-semibold">
-                            {formatXOF(e.amount)}
-                          </Td>
+                          <Td className="text-sbc-gold font-semibold">{formatXOF(e.amount)}</Td>
                           <Td>{e.source}</Td>
                           <Td>{e.reference || "-"}</Td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+
+            {/* ✅ PREUVES CGU + BOUTON PDF */}
+            <section className="bg-sbc-bgSoft/50 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-7 shadow-[0_18px_55px_rgba(0,0,0,0.85)] flex flex-col gap-4">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-sm md:text-base font-semibold text-sbc-gold">
+                  Preuves d’acceptation CGU
+                </h2>
+                <span className="text-[11px] text-sbc-muted">
+                  {cgu.length} enregistrements
+                </span>
+              </div>
+
+              {cguLoading && (
+                <div className="text-[11px] text-sbc-muted">Chargement des preuves CGU…</div>
+              )}
+
+              {!cguLoading && cguError && (
+                <div className="text-[11px] text-red-300">{cguError}</div>
+              )}
+
+              {!cguLoading && !cguError && cgu.length === 0 && (
+                <div className="text-[11px] text-sbc-muted">
+                  Aucune acceptation CGU enregistrée pour le moment.
+                </div>
+              )}
+
+              {!cguLoading && !cguError && cgu.length > 0 && (
+                <div className="w-full overflow-x-auto rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/30">
+                  <table className="min-w-[980px] text-[11px] md:text-xs border-collapse text-sbc-muted">
+                    <thead>
+                      <tr className="bg-sbc-bgSoft/70 text-sbc-gold">
+                        <Th>User</Th>
+                        <Th>Téléphone</Th>
+                        <Th>Accepté le</Th>
+                        <Th>Version</Th>
+                        <Th>Hash</Th>
+                        <Th>IP</Th>
+                        <Th>Actions</Th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cgu.map((u) => (
+                        <tr
+                          key={u.id}
+                          className="border-t border-sbc-border/40 hover:bg-sbc-bgSoft/40 transition"
+                        >
+                          <Td className="text-sbc-text">{u.fullName}</Td>
+                          <Td>{u.phone}</Td>
+                          <Td>
+                            {u.acceptCguAt
+                              ? new Date(u.acceptCguAt).toLocaleString("fr-FR")
+                              : "—"}
+                          </Td>
+                          <Td>{u.cguVersion ?? "—"}</Td>
+                          <Td className="max-w-[280px] truncate">{u.cguHash ?? "—"}</Td>
+                          <Td>{u.cguIp ?? "—"}</Td>
+                          <Td>
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                try {
+                                  await downloadCguProofPdf(u.id);
+                                } catch (e: any) {
+                                  alert(e?.message || "Erreur téléchargement PDF");
+                                }
+                              }}
+                              className="px-3 py-2 rounded-full border border-sbc-gold bg-sbc-bgSoft text-[11px] text-sbc-gold hover:bg-sbc-gold hover:text-sbc-bg transition"
+                            >
+                              Télécharger preuve CGU
+                            </button>
+                          </Td>
                         </tr>
                       ))}
                     </tbody>

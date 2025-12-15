@@ -144,3 +144,25 @@ export function getMyInvestments() {
 export function createInvestment(amountXOF: number) {
   return apiPost("/api/investments", { amountXOF });
 }
+
+export async function downloadCguProofPdf(userId: number): Promise<void> {
+  const url = `${API_BASE_URL}/api/admin/cgu-proof/${userId}`;
+
+  const res = await fetch(url, { credentials: "include" });
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(txt || `Erreur PDF (${res.status})`);
+  }
+
+  const blob = await res.blob();
+  const objectUrl = window.URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = objectUrl;
+  a.download = `preuve_CGU_user_${userId}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  window.URL.revokeObjectURL(objectUrl);
+}
