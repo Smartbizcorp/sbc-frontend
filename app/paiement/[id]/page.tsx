@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { trackEvent } from "@/lib/analytics";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -54,6 +55,7 @@ export default function PaiementChoixPage({
 
       const investment = data.investment;
       setCreatedInvestmentId(investment.id);
+      trackEvent("investment_create_success", { amountXOF });
 
       setMessage(
         `Votre demande d'investissement de ${amountXOF.toLocaleString(
@@ -72,6 +74,7 @@ export default function PaiementChoixPage({
         err?.message ||
           "Erreur lors de la création de l'investissement. Veuillez réessayer."
       );
+      trackEvent("investment_create_error", { amountXOF });
     } finally {
       setLoadingWave(false);
     }

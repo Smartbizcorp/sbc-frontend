@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { normalizeSenegalPhone } from "@/src/utils/phone";
 import { register as apiRegister } from "../../lib/api";
+import { trackEvent } from "@/lib/analytics";
 
 const SECURITY_QUESTIONS = [
   "Nom de votre premier établissement scolaire",
@@ -188,7 +189,9 @@ export default function RegisterPage() {
         throw new Error((data as any)?.message || "Erreur lors de l'inscription.");
       }
 
+      
       setSuccessMessage("Compte créé ! Vous pouvez vous connecter.");
+      trackEvent("register_success", { method: "phone" });
       setFullName("");
       setPhone("");
       setEmail("");
@@ -200,6 +203,7 @@ export default function RegisterPage() {
       setAcceptCgu(false);
     } catch (err: any) {
       setErrorMessage(err.message || "Erreur lors de l'inscription.");
+      trackEvent("register_error", { reason: "api_error" });
     } finally {
       setLoading(false);
     }
@@ -573,6 +577,17 @@ export default function RegisterPage() {
                 >
                   J’accepte
                 </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                trackEvent("cgu_open", { context: "register" });
+                setShowCguModal(true);
+                 }}
+  className="rounded-full border border-sbc-border bg-sbc-bgSoft px-4 py-2 text-[11px] text-sbc-muted hover:border-sbc-gold hover:text-sbc-gold transition"
+>
+  Lire les CGU
+</button>
+
               </div>
 
               {/* Alternative: lien vers une page dédiée */}
