@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Analytics } from "@vercel/analytics/react";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
+import { LangProvider } from "@/lib/i18n-provider";
 
 export const metadata: Metadata = {
   title: {
@@ -38,59 +39,61 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="min-h-screen bg-sbc-bg text-sbc-text flex flex-col">
-        {/* 🔔 Bannière d’installation PWA */}
-        <PwaInstallPrompt />
+        <LangProvider>
+          {/* 🔔 Bannière d’installation PWA */}
+          <PwaInstallPrompt />
 
-        {/* 🔝 Header global */}
-        <Header />
+          {/* 🔝 Header global */}
+          <Header />
 
-        {/* 📦 Contenu principal */}
-        <main className="flex-1 w-full">
-          <div
+          {/* 📦 Contenu principal */}
+          <main className="flex-1 w-full">
+            <div
+              className="
+                mx-auto w-full
+                max-w-3xl
+                sm:max-w-4xl
+                lg:max-w-5xl
+                xl:max-w-6xl
+                px-3
+                sm:px-5
+                md:px-8
+                lg:px-12
+                xl:px-16
+                py-4
+                sm:py-6
+                md:py-8
+              "
+            >
+              {children}
+            </div>
+          </main>
+
+          {/* 🧾 Footer */}
+          <footer
             className="
-              mx-auto w-full
-              max-w-3xl
-              sm:max-w-4xl
-              lg:max-w-5xl
-              xl:max-w-6xl
+              border-t border-sbc-border
               px-3
               sm:px-5
               md:px-8
               lg:px-12
               xl:px-16
-              py-4
-              sm:py-6
-              md:py-8
+              py-3
+              sm:py-3.5
+              md:py-4
+              text-center
+              text-[10px]
+              sm:text-[10.5px]
+              md:text-[11px]
+              text-sbc-muted
             "
           >
-            {children}
-          </div>
-        </main>
+            © {currentYear} Smart Business Corp — Tous droits réservés.
+          </footer>
 
-        {/* 🧾 Footer */}
-        <footer
-          className="
-            border-t border-sbc-border
-            px-3
-            sm:px-5
-            md:px-8
-            lg:px-12
-            xl:px-16
-            py-3
-            sm:py-3.5
-            md:py-4
-            text-center
-            text-[10px]
-            sm:text-[10.5px]
-            md:text-[11px]
-            text-sbc-muted
-          "
-        >
-          © {currentYear} Smart Business Corp — Tous droits réservés.
-        </footer>
-
-        {/* 📊 Vercel Web Analytics */}
-        <Analytics />
+          {/* 📊 Vercel Web Analytics */}
+          <Analytics />
+        </LangProvider>
       </body>
     </html>
   );

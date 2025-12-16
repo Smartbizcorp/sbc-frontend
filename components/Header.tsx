@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function Header() {
   const pathname = usePathname();
@@ -13,6 +14,11 @@ export function Header() {
   const isHome = pathname === "/";
   const isAbout = pathname === "/qui-sommes-nous";
   const isFaq = pathname === "/faq";
+
+  // ✅ Ferme le menu mobile quand on change de page
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   return (
     <header className="w-full border-b border-sbc-border bg-sbc-bg/95 backdrop-blur z-30">
@@ -34,10 +40,7 @@ export function Header() {
         "
       >
         {/* LOGO + TITRE */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 sm:gap-3 min-w-0"
-        >
+        <Link href="/" className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="relative h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 flex-shrink-0">
             <Image
               src="/logo-smart-business-corp.png"
@@ -58,52 +61,58 @@ export function Header() {
           </div>
         </Link>
 
-        {/* NAV DESKTOP / TABLETTE */}
-        <nav className="hidden md:flex items-center gap-2 text-xs md:text-[11px]">
-          <Link
-            href="/"
-            className={`px-3 py-1.5 rounded-full border transition ${
-              isHome
-                ? "border-sbc-gold bg-sbc-gold/10 text-sbc-gold"
-                : "border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft"
-            }`}
-          >
-            Accueil
-          </Link>
+        {/* ZONE DROITE DESKTOP */}
+        <div className="hidden md:flex items-center gap-3">
+          {/* NAV DESKTOP / TABLETTE */}
+          <nav className="flex items-center gap-2 text-xs md:text-[11px]">
+            <Link
+              href="/"
+              className={`px-3 py-1.5 rounded-full border transition ${
+                isHome
+                  ? "border-sbc-gold bg-sbc-gold/10 text-sbc-gold"
+                  : "border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft"
+              }`}
+            >
+              Accueil
+            </Link>
 
-          <Link
-            href="/qui-sommes-nous"
-            className={`px-3 py-1.5 rounded-full border transition ${
-              isAbout
-                ? "border-sbc-gold bg-sbc-gold/10 text-sbc-gold"
-                : "border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft"
-            }`}
-          >
-            Qui sommes-nous
-          </Link>
+            <Link
+              href="/qui-sommes-nous"
+              className={`px-3 py-1.5 rounded-full border transition ${
+                isAbout
+                  ? "border-sbc-gold bg-sbc-gold/10 text-sbc-gold"
+                  : "border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft"
+              }`}
+            >
+              Qui sommes-nous
+            </Link>
 
-          <Link
-            href="/faq"
-            className={`px-3 py-1.5 rounded-full border transition ${
-              isFaq
-                ? "border-sbc-gold bg-sbc-gold/10 text-sbc-gold"
-                : "border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft"
-            }`}
-          >
-            FAQ
-          </Link>
+            <Link
+              href="/faq"
+              className={`px-3 py-1.5 rounded-full border transition ${
+                isFaq
+                  ? "border-sbc-gold bg-sbc-gold/10 text-sbc-gold"
+                  : "border-sbc-border text-sbc-muted hover:bg-sbc-bgSoft"
+              }`}
+            >
+              FAQ
+            </Link>
 
-          <Link
-            href={onDashboard ? "/dashboard" : "/login"}
-            className={`px-3 py-1.5 rounded-full border text-xs md:text-sm transition ${
-              onDashboard
-                ? "border-emerald-500 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                : "border-sbc-gold bg-sbc-gold text-sbc-bg hover:bg-sbc-goldSoft hover:text-sbc-bg"
-            }`}
-          >
-            {onDashboard ? "Dashboard" : "Espace client"}
-          </Link>
-        </nav>
+            <Link
+              href={onDashboard ? "/dashboard" : "/login"}
+              className={`px-3 py-1.5 rounded-full border text-xs md:text-sm transition ${
+                onDashboard
+                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                  : "border-sbc-gold bg-sbc-gold text-sbc-bg hover:bg-sbc-goldSoft hover:text-sbc-bg"
+              }`}
+            >
+              {onDashboard ? "Dashboard" : "Espace client"}
+            </Link>
+          </nav>
+
+          {/* ✅ Sélecteur langue (desktop) */}
+          <LanguageSwitcher />
+        </div>
 
         {/* BOUTON BURGER MOBILE */}
         <button
@@ -123,7 +132,9 @@ export function Header() {
             hover:text-sbc-gold
           "
           onClick={() => setMobileOpen((prev) => !prev)}
-          aria-label="Ouvrir le menu"
+          aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav"
         >
           <span className="sr-only">Menu</span>
           <div className="flex flex-col gap-[3px]">
@@ -148,11 +159,13 @@ export function Header() {
 
       {/* MENU MOBILE DÉROULANT */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-sbc-border bg-sbc-bg/98 px-3 sm:px-4 pb-3">
+        <div
+          id="mobile-nav"
+          className="md:hidden border-t border-sbc-border bg-sbc-bg/98 px-3 sm:px-4 pb-3"
+        >
           <nav className="flex flex-col gap-2 pt-2 text-xs">
             <Link
               href="/"
-              onClick={() => setMobileOpen(false)}
               className={`w-full px-3 py-2 rounded-full border transition ${
                 isHome
                   ? "border-sbc-gold bg-sbc-gold/10 text-sbc-gold"
@@ -164,7 +177,6 @@ export function Header() {
 
             <Link
               href="/qui-sommes-nous"
-              onClick={() => setMobileOpen(false)}
               className={`w-full px-3 py-2 rounded-full border transition ${
                 isAbout
                   ? "border-sbc-gold bg-sbc-gold/10 text-sbc-gold"
@@ -176,7 +188,6 @@ export function Header() {
 
             <Link
               href="/faq"
-              onClick={() => setMobileOpen(false)}
               className={`w-full px-3 py-2 rounded-full border transition ${
                 isFaq
                   ? "border-sbc-gold bg-sbc-gold/10 text-sbc-gold"
@@ -188,7 +199,6 @@ export function Header() {
 
             <Link
               href={onDashboard ? "/dashboard" : "/login"}
-              onClick={() => setMobileOpen(false)}
               className={`
                 w-full px-3 py-2 rounded-full border text-xs font-medium mt-1 transition
                 ${
@@ -200,6 +210,11 @@ export function Header() {
             >
               {onDashboard ? "Dashboard" : "Espace client"}
             </Link>
+
+            {/* ✅ Sélecteur langue (mobile) */}
+            <div className="mt-2">
+              <LanguageSwitcher />
+            </div>
           </nav>
         </div>
       )}
