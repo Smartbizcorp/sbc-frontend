@@ -1,17 +1,24 @@
 "use client";
 
+import React from "react";
 import { useAutoTranslate } from "@/lib/useAutoTranslate";
-import { useLocale } from "@/lib/useLocale";
 
-export function T({ children }: { children: string }) {
-  const { locale } = useLocale();
+/**
+ * Usage:
+ *   <T>Accueil</T>
+ *   <button><T>S'inscrire</T></button>
+ */
+export function T({ children }: { children: React.ReactNode }) {
+  // on ne traduit que les strings simples
+  const raw = typeof children === "string" ? children : null;
+  const { text } = useAutoTranslate(raw ?? "");
 
-  const { translated } = useAutoTranslate({
-    text: children,
-    from: "fr",
-    to: locale,
-    enabled: locale !== "fr",
-  });
+  if (raw === null) return <>{children}</>;
 
-  return <>{translated}</>;
+  // évite les warnings hydratation (serveur FR -> client traduit)
+  return (
+    <span suppressHydrationWarning>
+      {text}
+    </span>
+  );
 }

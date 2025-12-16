@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   DEFAULT_LOCALE,
   type SupportedLocale,
@@ -17,37 +18,25 @@ type LangContextValue = {
 
 const LangContext = createContext<LangContextValue | null>(null);
 
-function getLangFromQuery(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("lang");
-  } catch {
-    return null;
-  }
-}
-
-function setLangInQuery(locale: string) {
-  if (typeof window === "undefined") return;
-  try {
-    const url = new URL(window.location.href);
-    url.searchParams.set("lang", locale);
-    // ✅ pas de navigation Next.js, pas de SSR bailout
-    window.history.replaceState(null, "", url.toString());
-  } catch {
-    // ignore
-  }
-}
-
 export function LangProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [locale, setLocaleState] = useState<SupportedLocale>(DEFAULT_LOCALE);
 
-  // init (storage/cookie) + override via ?lang=
+  // init (storage/cookie)
   useEffect(() => {
-    const fromStorage = getLocaleClient();
-    const q = getLangFromQuery();
-    const normalized = normalizeLocale(q || fromStorage);
+    setLocaleState(getLocaleClient());
+  }, []);
 
+  // init (optionnel) depuis ?lang=xx SANS useSearchParams
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("lang");
+    if (!q) return;
+
+    const normalized = normalizeLocale(q);
     setLocaleClient(normalized);
     setLocaleState(normalized);
   }, []);
@@ -57,10 +46,15 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     setLocaleClient(normalized);
     setLocaleState(normalized);
 
-    // garder ?lang=xx dans l’URL (partage) sans casser le build
-    setLangInQuery(normalized);
+    // garder ?lang=xx dans l'URL (partage) sans casser
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      params.set("lang", normalized);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    } else {
+      router.refresh();
+    }
 
-    // tracking (optionnel)
     trackEvent("locale_change", { locale: normalized });
   };
 

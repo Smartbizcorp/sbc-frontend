@@ -1,23 +1,21 @@
 "use client";
 
 import { SUPPORTED_LOCALES } from "@/lib/i18n";
-import { useLocale } from "@/lib/useLocale";
-import { useRouter } from "next/navigation";
+import { useLang } from "@/lib/i18n-provider";
+import { T } from "@/components/T";
 
 export function LanguageSwitcher() {
-  const { locale, setLocale } = useLocale();
-  const router = useRouter();
+  const { locale, setLocale } = useLang();
 
   return (
     <div className="inline-flex items-center gap-2">
-      <span className="text-[10px] sm:text-[11px] text-sbc-muted">Langue</span>
+      <span className="text-[10px] sm:text-[11px] text-sbc-muted">
+        <T>Langue</T>
+      </span>
 
       <select
         value={locale}
-        onChange={(e) => {
-          setLocale(e.target.value as any);
-          router.refresh(); // ✅ retrigger des traductions sans changer l’URL
-        }}
+        onChange={(e) => setLocale(e.target.value)}
         className="
           rounded-full border border-sbc-border bg-sbc-bgSoft/60
           px-3 py-2 text-[11px] text-sbc-text
