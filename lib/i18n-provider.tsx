@@ -1,14 +1,14 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   DEFAULT_LOCALE,
-  SupportedLocale,
+  type SupportedLocale,
   getLocaleClient,
   normalizeLocale,
   setLocaleClient,
 } from "@/lib/i18n";
+import { trackEvent } from "@/lib/analytics";
 
 type LangContextValue = {
   locale: SupportedLocale;
@@ -17,47 +17,56 @@ type LangContextValue = {
 
 const LangContext = createContext<LangContextValue | null>(null);
 
-export function LangProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+function getLangFromQuery(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("lang");
+  } catch {
+    return null;
+  }
+}
 
+function setLangInQuery(locale: string) {
+  if (typeof window === "undefined") return;
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set("lang", locale);
+    // ✅ pas de navigation Next.js, pas de SSR bailout
+    window.history.replaceState(null, "", url.toString());
+  } catch {
+    // ignore
+  }
+}
+
+export function LangProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<SupportedLocale>(DEFAULT_LOCALE);
 
-  // init (storage/cookie/?lang)
+  // init (storage/cookie) + override via ?lang=
   useEffect(() => {
-    setLocaleState(getLocaleClient());
-  }, []);
+    const fromStorage = getLocaleClient();
+    const q = getLangFromQuery();
+    const normalized = normalizeLocale(q || fromStorage);
 
-  // sync URL ?lang=xx
-  useEffect(() => {
-    const q = searchParams?.get("lang");
-    if (!q) return;
-
-    const normalized = normalizeLocale(q);
     setLocaleClient(normalized);
     setLocaleState(normalized);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams?.get("lang")]);
+  }, []);
 
   const setLocale = (l: string) => {
     const normalized = normalizeLocale(l);
     setLocaleClient(normalized);
     setLocaleState(normalized);
 
-    // garder ?lang=xx dans l’URL (partage)
-    const params = new URLSearchParams(searchParams?.toString() || "");
-    params.set("lang", normalized);
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    // garder ?lang=xx dans l’URL (partage) sans casser le build
+    setLangInQuery(normalized);
+
+    // tracking (optionnel)
+    trackEvent("locale_change", { locale: normalized });
   };
 
   const value = useMemo(() => ({ locale, setLocale }), [locale]);
 
-  return (
-    <LangContext.Provider value={value}>
-      {children}
-    </LangContext.Provider>
-  );
+  return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
 }
 
 export function useLang() {
