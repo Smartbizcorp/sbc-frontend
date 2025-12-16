@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { normalizeSenegalPhone } from "@/src/utils/phone";
 import { login as apiLogin } from "../../lib/api";
+import { T, useTr } from "@/components/T";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { tr } = useTr();
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -37,21 +39,17 @@ export default function LoginPage() {
     }
 
     try {
-      // Passe par lib/api.ts → POST /api/login (avec credentials: "include")
       const data = await apiLogin({
         phone: phone.trim(),
         password: password.trim(),
       });
 
-      if (!data || (typeof data === "object" && data.success === false)) {
+      if (!data || (typeof data === "object" && (data as any).success === false)) {
         throw new Error((data as any)?.message || "Erreur de connexion.");
       }
 
-      // Le backend renvoie { success, user: {...} }
       const user = (data as any).user;
-      if (user) {
-        localStorage.setItem("sbc_user", JSON.stringify(user));
-      }
+      if (user) localStorage.setItem("sbc_user", JSON.stringify(user));
 
       router.push("/dashboard");
     } catch (err: any) {
@@ -67,13 +65,13 @@ export default function LoginPage() {
       {/* Bandeau intro */}
       <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_20px_55px_rgba(0,0,0,0.9)]">
         <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-sbc-gold mb-1.5 sm:mb-2">
-          Connexion
+          <T>Connexion</T>
         </p>
         <h1 className="text-2xl sm:text-3xl font-semibold mb-2 sm:mb-3 leading-snug">
-          Accédez à votre espace
+          <T>Accédez à votre espace</T>
         </h1>
         <p className="text-xs sm:text-sm text-sbc-muted leading-relaxed">
-          Connectez-vous pour suivre votre portefeuille Smart Business Corp.
+          <T>Connectez-vous pour suivre votre portefeuille Smart Business Corp.</T>
         </p>
       </section>
 
@@ -82,14 +80,14 @@ export default function LoginPage() {
         <form className="flex flex-col gap-4 sm:gap-5" onSubmit={handleSubmit}>
           {errorMessage && (
             <div className="text-[11px] sm:text-xs text-red-400 bg-red-950/30 border border-red-700/50 rounded-2xl px-3 py-2">
-              {errorMessage}
+              <T>{errorMessage}</T>
             </div>
           )}
 
           {/* Téléphone */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[11px] sm:text-xs text-sbc-muted">
-              Téléphone (WhatsApp){" "}
+              <T>Téléphone (WhatsApp)</T>{" "}
               <span className="text-sbc-gold">*</span>
             </label>
             <input
@@ -98,14 +96,15 @@ export default function LoginPage() {
               value={phone}
               onChange={(e) => setPhone(normalizeSenegalPhone(e.target.value))}
               className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text focus:border-sbc-gold outline-none"
-              placeholder="+221 77 000 00 00"
+              placeholder={tr("+221 77 000 00 00")}
+              aria-label={tr("Téléphone (WhatsApp)")}
             />
           </div>
 
           {/* Mot de passe */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[11px] sm:text-xs text-sbc-muted">
-              Mot de passe <span className="text-sbc-gold">*</span>
+              <T>Mot de passe</T> <span className="text-sbc-gold">*</span>
             </label>
             <input
               type="password"
@@ -113,7 +112,8 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-sm text-sbc-text focus:border-sbc-gold outline-none"
-              placeholder="Votre mot de passe"
+              placeholder={tr("Votre mot de passe")}
+              aria-label={tr("Mot de passe")}
             />
           </div>
 
@@ -121,24 +121,27 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
             className="mt-1 px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg text-xs sm:text-sm font-semibold hover:bg-sbc-goldSoft transition disabled:opacity-60"
+            aria-label={tr(loading ? "Connexion..." : "Se connecter")}
           >
-            {loading ? "Connexion..." : "Se connecter"}
+            <T>{loading ? "Connexion..." : "Se connecter"}</T>
           </button>
 
           <div className="mt-3 flex flex-col gap-1">
             <Link
               href="/forgot-password"
               className="text-[11px] sm:text-xs text-sbc-muted underline hover:text-sbc-gold"
+              aria-label={tr("Mot de passe oublié ?")}
             >
-              Mot de passe oublié ?
+              <T>Mot de passe oublié ?</T>
             </Link>
           </div>
 
           <Link
             href="/register"
             className="text-[11px] sm:text-xs text-sbc-muted underline hover:text-sbc-gold mt-2"
+            aria-label={tr("Créer un compte")}
           >
-            Créer un compte
+            <T>Créer un compte</T>
           </Link>
         </form>
       </section>

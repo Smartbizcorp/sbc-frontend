@@ -1,5 +1,8 @@
 // frontend/app/cgu/page.tsx
+"use client";
+
 import Link from "next/link";
+import { T } from "@/components/T";
 
 const CGU_VERSION = "v1.0";
 const EFFECTIVE_DATE = "13/12/2025"; // change si besoin
@@ -79,20 +82,29 @@ En cochant la case « J’accepte les Conditions Générales d’Utilisation »,
 
 export default function CguPage() {
   return (
-    <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 md:px-0 py-6 sm:py-8">
+    <div
+      id="top"
+      className="w-full max-w-4xl mx-auto px-3 sm:px-4 md:px-0 py-6 sm:py-8"
+    >
       {/* Header */}
       <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_18px_45px_rgba(0,0,0,0.85)]">
         <p className="uppercase text-[10px] sm:text-[11px] tracking-[0.25em] text-sbc-gold">
-          Légal
+          <T>Légal</T>
         </p>
 
         <h1 className="text-2xl sm:text-3xl md:text-[32px] font-semibold mt-2 leading-snug">
-          Conditions Générales d’Utilisation
+          <T>Conditions Générales d’Utilisation</T>
         </h1>
 
         <p className="mt-2 text-xs sm:text-sm text-sbc-muted leading-relaxed">
-          Version <span className="text-sbc-text">{CGU_VERSION}</span> — Entrée
-          en vigueur : <span className="text-sbc-text">{EFFECTIVE_DATE}</span>
+          <T>Version </T>
+          <span className="text-sbc-text">
+            <T>{CGU_VERSION}</T>
+          </span>
+          <T> — Entrée en vigueur : </T>
+          <span className="text-sbc-text">
+            <T>{EFFECTIVE_DATE}</T>
+          </span>
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
@@ -102,20 +114,21 @@ export default function CguPage() {
             rel="noreferrer"
             className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg text-xs sm:text-sm font-semibold hover:bg-sbc-goldSoft transition"
           >
-            Télécharger PDF
+            <T>Télécharger PDF</T>
           </a>
 
           <Link
             href="/register"
             className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-sbc-border text-xs sm:text-sm text-sbc-text hover:border-sbc-gold hover:text-sbc-gold transition"
           >
-            Aller à l’inscription
+            <T>Aller à l’inscription</T>
           </Link>
         </div>
       </section>
 
       {/* Content */}
       <section className="mt-5 sm:mt-6 bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+        {/* IMPORTANT: T ne traduit que les strings simples, donc ici on garde la string brute */}
         <pre className="whitespace-pre-wrap text-[11px] sm:text-xs text-sbc-muted leading-relaxed">
           {CGU_CONTENT}
         </pre>
@@ -125,20 +138,17 @@ export default function CguPage() {
             href="#top"
             className="text-[11px] sm:text-xs text-sbc-muted underline hover:text-sbc-gold"
           >
-            Revenir en haut
+            <T>Revenir en haut</T>
           </a>
 
           <Link
             href="/"
             className="text-[11px] sm:text-xs text-sbc-muted underline hover:text-sbc-gold"
           >
-            Retour accueil
+            <T>Retour accueil</T>
           </Link>
         </div>
       </section>
-
-      {/* Invisible anchor */}
-      <div id="top" className="sr-only" />
     </div>
   );
 }

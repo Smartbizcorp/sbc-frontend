@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { T } from "@/components/T";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -18,6 +19,16 @@ type Profile = {
   idNumber: string | null;
   securityQuestion: string | null;
 };
+
+async function safeJson(res: Response) {
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    const text = await res.text();
+    console.error("Réponse NON JSON :", res.url, text);
+    throw new Error("Le serveur a répondu avec un format invalide.");
+  }
+  return res.json();
+}
 
 export default function ComptePage() {
   const router = useRouter();
@@ -124,7 +135,7 @@ export default function ComptePage() {
           credentials: "include",
         });
 
-        const json = await res.json();
+        const json = await safeJson(res);
 
         if (!res.ok || !json.success) {
           if (res.status === 401) {
@@ -197,7 +208,7 @@ export default function ComptePage() {
         body: JSON.stringify(payload),
       });
 
-      const json = await res.json();
+      const json = await safeJson(res);
       if (!res.ok || !json.success)
         throw new Error(json.message || "Erreur lors de la mise à jour du profil.");
 
@@ -257,7 +268,7 @@ export default function ComptePage() {
         }),
       });
 
-      const json = await res.json();
+      const json = await safeJson(res);
       if (!res.ok || !json.success)
         throw new Error(json.message || "Erreur lors du changement de mot de passe.");
 
@@ -269,9 +280,7 @@ export default function ComptePage() {
       setConfirmPassword("");
     } catch (e: any) {
       console.error(e);
-      setErrorPassword(
-        e?.message || "Erreur lors du changement de mot de passe."
-      );
+      setErrorPassword(e?.message || "Erreur lors du changement de mot de passe.");
     } finally {
       setSavingPassword(false);
     }
@@ -281,7 +290,7 @@ export default function ComptePage() {
     return (
       <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-3xl mx-auto text-xs md:text-sm text-sbc-muted">
-          Chargement...
+          <T>Chargement...</T>
         </div>
       </main>
     );
@@ -291,7 +300,7 @@ export default function ComptePage() {
     return (
       <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-3xl mx-auto text-xs md:text-sm text-red-300">
-          Erreur profil.
+          <T>Erreur profil.</T>
         </div>
       </main>
     );
@@ -333,8 +342,7 @@ export default function ComptePage() {
     return `${(passwordScore / 4) * 100}%`;
   })();
 
-  const passwordsMatch =
-    !confirmPassword || newPassword === confirmPassword;
+  const passwordsMatch = !confirmPassword || newPassword === confirmPassword;
 
   return (
     <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
@@ -343,18 +351,20 @@ export default function ComptePage() {
         <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
             <p className="text-[11px] uppercase tracking-[0.26em] text-sbc-gold">
-              Compte
+              <T>Compte</T>
             </p>
             <h1 className="text-2xl md:text-3xl font-semibold mt-1">
-              Paramètres du profil
+              <T>Paramètres du profil</T>
             </h1>
             <p className="text-xs md:text-sm text-sbc-muted max-w-xl mt-2 leading-relaxed">
-              Gérez vos informations personnelles, vos coordonnées de paiement et
-              la sécurité votre compte Smart Business Corp.
+              <T>
+                Gérez vos informations personnelles, vos coordonnées de paiement et
+                la sécurité votre compte Smart Business Corp.
+              </T>
             </p>
           </div>
           <div className="text-xs md:text-sm text-sbc-muted">
-            <p>Client</p>
+            <p><T>Client</T></p>
             <p className="text-sbc-text font-medium">{profile.fullName}</p>
             <p className="text-[11px]">{profile.phone}</p>
 
@@ -362,7 +372,7 @@ export default function ComptePage() {
               onClick={() => router.push("/dashboard")}
               className="mt-2 px-4 py-1 rounded-full border border-sbc-gold text-sbc-gold text-[10px] md:text-xs font-semibold hover:bg-sbc-gold hover:text-sbc-bgSoft transition"
             >
-              Mon Dashboard
+              <T>Mon Dashboard</T>
             </button>
           </div>
         </section>
@@ -370,7 +380,7 @@ export default function ComptePage() {
         {/* INFOS PERSONNELLES */}
         <section className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
           <h2 className="text-sm md:text-base font-semibold text-sbc-gold mb-3">
-            Infos personnelles
+            <T>Infos personnelles</T>
           </h2>
 
           {errorProfile && (
@@ -384,15 +394,12 @@ export default function ComptePage() {
             </div>
           )}
 
-          <form
-            onSubmit={handleProfileSubmit}
-            className="flex flex-col gap-4 md:gap-5"
-          >
+          <form onSubmit={handleProfileSubmit} className="flex flex-col gap-4 md:gap-5">
             {/* NOM + TELEPHONE */}
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Nom complet
+                  <T>Nom complet</T>
                 </label>
                 <input
                   type="text"
@@ -400,12 +407,12 @@ export default function ComptePage() {
                   disabled
                   className="rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/60 px-3 py-2 text-xs md:text-sm text-sbc-text/80 outline-none cursor-not-allowed"
                 />
-                <p className="text-[10px] text-sbc-muted">Non modifiable.</p>
+                <p className="text-[10px] text-sbc-muted"><T>Non modifiable.</T></p>
               </div>
 
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Téléphone
+                  <T>Téléphone</T>
                 </label>
                 <input
                   type="tel"
@@ -413,7 +420,7 @@ export default function ComptePage() {
                   disabled
                   className="rounded-2xl border border-sbc-border/60 bg-sbc-bgSoft/60 px-3 py-2 text-xs md:text-sm text-sbc-text/80 outline-none cursor-not-allowed"
                 />
-                <p className="text-[10px] text-sbc-muted">Non modifiable.</p>
+                <p className="text-[10px] text-sbc-muted"><T>Non modifiable.</T></p>
               </div>
             </div>
 
@@ -421,7 +428,7 @@ export default function ComptePage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Adresse e-mail
+                  <T>Adresse e-mail</T>
                 </label>
                 <input
                   type="email"
@@ -434,7 +441,7 @@ export default function ComptePage() {
 
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Date de naissance
+                  <T>Date de naissance</T>
                 </label>
                 <input
                   type="date"
@@ -449,9 +456,7 @@ export default function ComptePage() {
                   }`}
                 />
                 <p className="text-[10px] text-sbc-muted">
-                  {birthLocked
-                    ? "Non modifiable."
-                    : "Sera verrouillée après validation."}
+                  {birthLocked ? <T>Non modifiable.</T> : <T>Sera verrouillée après validation.</T>}
                 </p>
               </div>
             </div>
@@ -460,7 +465,7 @@ export default function ComptePage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Pièce d’identité
+                  <T>Pièce d’identité</T>
                 </label>
                 <select
                   name="idType"
@@ -468,7 +473,7 @@ export default function ComptePage() {
                   onChange={handleProfileChange}
                   className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
                 >
-                  <option value="">Sélectionnez une pièce</option>
+                  <option value=""><T>Sélectionnez une pièce</T></option>
                   {ID_TYPES.map((t) => (
                     <option key={t} value={t}>
                       {t}
@@ -479,7 +484,7 @@ export default function ComptePage() {
 
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Numéro de la pièce
+                  <T>Numéro de la pièce</T>
                 </label>
                 <input
                   type="text"
@@ -494,12 +499,12 @@ export default function ComptePage() {
             {/* PAIEMENT */}
             <div className="mt-4 pt-4 border-t border-sbc-border/40">
               <h3 className="text-[11px] md:text-xs uppercase tracking-[0.18em] text-sbc-gold mb-3">
-                Infos de paiement
+                <T>Infos de paiement</T>
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] md:text-xs text-sbc-muted">
-                    Numéro Wave
+                    <T>Numéro Wave</T>
                   </label>
                   <input
                     type="tel"
@@ -511,7 +516,7 @@ export default function ComptePage() {
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] md:text-xs text-sbc-muted">
-                    Numéro Orange Money
+                    <T>Numéro Orange Money</T>
                   </label>
                   <input
                     type="tel"
@@ -527,13 +532,13 @@ export default function ComptePage() {
             {/* LOCALISATION */}
             <div className="mt-4 pt-4 border-t border-sbc-border/40">
               <h3 className="text-[11px] md:text-xs uppercase tracking-[0.18em] text-sbc-gold mb-3">
-                Localisation
+                <T>Localisation</T>
               </h3>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] md:text-xs text-sbc-muted">
-                    Pays
+                    <T>Pays</T>
                   </label>
                   <select
                     name="country"
@@ -553,7 +558,7 @@ export default function ComptePage() {
                     }}
                     className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
                   >
-                    <option value="">Choisissez un pays</option>
+                    <option value=""><T>Choisissez un pays</T></option>
                     {AFRICA_COUNTRIES.map((c) => (
                       <option key={c.code} value={c.name}>
                         {c.name} ({c.prefix})
@@ -564,7 +569,7 @@ export default function ComptePage() {
 
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] md:text-xs text-sbc-muted">
-                    Ville
+                    <T>Ville</T>
                   </label>
                   <input
                     type="text"
@@ -580,12 +585,12 @@ export default function ComptePage() {
             {/* QUESTION SECURITE */}
             <div className="mt-4 pt-4 border-t border-sbc-border/40">
               <h3 className="text-[11px] md:text-xs uppercase tracking-[0.18em] text-sbc-gold mb-3">
-                Question de sécurité
+                <T>Question de sécurité</T>
               </h3>
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] md:text-xs text-sbc-muted">
-                    Question
+                    <T>Question</T>
                   </label>
                   <select
                     name="securityQuestion"
@@ -593,7 +598,7 @@ export default function ComptePage() {
                     onChange={handleProfileChange}
                     className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
                   >
-                    <option value="">Sélectionnez une question</option>
+                    <option value=""><T>Sélectionnez une question</T></option>
                     {SECURITY_QUESTIONS.map((q) => (
                       <option key={q} value={q}>
                         {q}
@@ -604,7 +609,7 @@ export default function ComptePage() {
 
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] md:text-xs text-sbc-muted">
-                    Réponse
+                    <T>Réponse</T>
                   </label>
                   <input
                     type="text"
@@ -614,7 +619,7 @@ export default function ComptePage() {
                     className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs md:text-sm text-sbc-text outline-none focus:border-sbc-gold transition"
                   />
                   <p className="text-[10px] text-sbc-muted">
-                    Stockée de manière sécurisée.
+                    <T>Stockée de manière sécurisée.</T>
                   </p>
                 </div>
               </div>
@@ -626,7 +631,7 @@ export default function ComptePage() {
                 disabled={savingProfile}
                 className="px-5 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bgSoft text-xs md:text-sm font-semibold transition disabled:opacity-60"
               >
-                {savingProfile ? "Enregistrement..." : "Enregistrer les modifications"}
+                {savingProfile ? <T>Enregistrement...</T> : <T>Enregistrer les modifications</T>}
               </button>
             </div>
           </form>
@@ -635,7 +640,7 @@ export default function ComptePage() {
         {/* MDP */}
         <section className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-5 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
           <h2 className="text-sm md:text-base font-semibold text-sbc-gold mb-3">
-            Sécurité du compte
+            <T>Sécurité du compte</T>
           </h2>
 
           {errorPassword && (
@@ -649,13 +654,10 @@ export default function ComptePage() {
             </div>
           )}
 
-          <form
-            onSubmit={handlePasswordSubmit}
-            className="flex flex-col gap-4 md:gap-5"
-          >
+          <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-4 md:gap-5">
             <div className="flex flex-col gap-1">
               <label className="text-[11px] md:text-xs text-sbc-muted">
-                Mot de passe actuel
+                <T>Mot de passe actuel</T>
               </label>
               <input
                 type="password"
@@ -669,7 +671,7 @@ export default function ComptePage() {
               {/* Nouveau mot de passe */}
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Nouveau mot de passe
+                  <T>Nouveau mot de passe</T>
                 </label>
                 <div className="relative">
                   <input
@@ -702,7 +704,7 @@ export default function ComptePage() {
                   </div>
                   {strengthLabel && (
                     <p className="text-[10px] text-sbc-muted">
-                      {strengthLabel}
+                      <T>{strengthLabel}</T>
                     </p>
                   )}
                 </div>
@@ -710,36 +712,20 @@ export default function ComptePage() {
                 {/* Checklist dynamique */}
                 <ul className="mt-2 space-y-1 text-[10px] text-sbc-muted">
                   <li className="flex items-center gap-1">
-                    <span
-                      className={hasLength ? "text-emerald-400" : "text-sbc-muted"}
-                    >
-                      ●
-                    </span>
-                    <span>Au moins 8 caractères</span>
+                    <span className={hasLength ? "text-emerald-400" : "text-sbc-muted"}>●</span>
+                    <span><T>Au moins 8 caractères</T></span>
                   </li>
                   <li className="flex items-center gap-1">
-                    <span
-                      className={hasLetter ? "text-emerald-400" : "text-sbc-muted"}
-                    >
-                      ●
-                    </span>
-                    <span>Contient des lettres (a–z)</span>
+                    <span className={hasLetter ? "text-emerald-400" : "text-sbc-muted"}>●</span>
+                    <span><T>Contient des lettres (a–z)</T></span>
                   </li>
                   <li className="flex items-center gap-1">
-                    <span
-                      className={hasNumber ? "text-emerald-400" : "text-sbc-muted"}
-                    >
-                      ●
-                    </span>
-                    <span>Contient des chiffres (0–9)</span>
+                    <span className={hasNumber ? "text-emerald-400" : "text-sbc-muted"}>●</span>
+                    <span><T>Contient des chiffres (0–9)</T></span>
                   </li>
                   <li className="flex items-center gap-1">
-                    <span
-                      className={hasUpper ? "text-emerald-400" : "text-sbc-muted"}
-                    >
-                      ●
-                    </span>
-                    <span>Majuscule recommandée (A–Z)</span>
+                    <span className={hasUpper ? "text-emerald-400" : "text-sbc-muted"}>●</span>
+                    <span><T>Majuscule recommandée (A–Z)</T></span>
                   </li>
                 </ul>
               </div>
@@ -747,7 +733,7 @@ export default function ComptePage() {
               {/* Confirmer le mot de passe */}
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] md:text-xs text-sbc-muted">
-                  Confirmer le mot de passe
+                  <T>Confirmer le mot de passe</T>
                 </label>
                 <div className="relative">
                   <input
@@ -761,9 +747,7 @@ export default function ComptePage() {
                     onClick={() => setShowConfirmPassword((v) => !v)}
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
                     aria-label={
-                      showConfirmPassword
-                        ? "Masquer la confirmation"
-                        : "Afficher la confirmation"
+                      showConfirmPassword ? "Masquer la confirmation" : "Afficher la confirmation"
                     }
                   >
                     {showConfirmPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
@@ -771,7 +755,7 @@ export default function ComptePage() {
                 </div>
                 {!passwordsMatch && (
                   <p className="mt-1 text-[10px] text-red-400">
-                    Les mots de passe ne correspondent pas.
+                    <T>Les mots de passe ne correspondent pas.</T>
                   </p>
                 )}
               </div>
@@ -783,7 +767,7 @@ export default function ComptePage() {
                 disabled={savingPassword}
                 className="px-5 py-2 rounded-full border border-sbc-gold bg-transparent text-sbc-gold text-xs md:text-sm font-semibold hover:bg-sbc-gold/10 transition disabled:opacity-60"
               >
-                {savingPassword ? "Mise à jour..." : "Mettre à jour le mot de passe"}
+                {savingPassword ? <T>Mise à jour...</T> : <T>Mettre à jour le mot de passe</T>}
               </button>
             </div>
           </form>

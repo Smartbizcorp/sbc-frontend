@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { T } from "@/components/T";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -38,7 +39,6 @@ type ProfileMini = {
   phone: string;
 };
 
-// 🔔 Notifications venant de la table Notification
 type NotificationItem = {
   id: number;
   type: string;
@@ -47,6 +47,17 @@ type NotificationItem = {
   createdAt: string;
   readAt: string | null;
 };
+
+// ✅ JSON safe (évite crash si HTML/texte)
+async function safeJson(res: Response) {
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    const text = await res.text();
+    console.error("Réponse NON JSON:", res.url, text);
+    throw new Error("Le serveur a répondu avec un format invalide.");
+  }
+  return res.json();
+}
 
 export default function NotificationsPage() {
   const router = useRouter();
@@ -85,7 +96,7 @@ export default function NotificationsPage() {
           fetch(`${API_URL}/api/notifications`, { credentials: "include" }),
         ]);
 
-        // Si une des requêtes renvoie 401 → déconnexion
+        // 401 → logout
         if (
           wRes.status === 401 ||
           iRes.status === 401 ||
@@ -98,10 +109,10 @@ export default function NotificationsPage() {
         }
 
         const [wJson, iJson, pJson, nJson] = await Promise.all([
-          wRes.json(),
-          iRes.json(),
-          pRes.json(),
-          nRes.json(),
+          safeJson(wRes),
+          safeJson(iRes),
+          safeJson(pRes),
+          safeJson(nRes),
         ]);
 
         if (!wRes.ok || !wJson.success) {
@@ -114,9 +125,7 @@ export default function NotificationsPage() {
           throw new Error(pJson.message || "Erreur chargement profil.");
         }
         if (!nRes.ok || !nJson.success) {
-          throw new Error(
-            nJson.message || "Erreur chargement des notifications."
-          );
+          throw new Error(nJson.message || "Erreur chargement des notifications.");
         }
 
         setWithdrawals(wJson.withdrawals || []);
@@ -125,14 +134,10 @@ export default function NotificationsPage() {
           fullName: pJson.profile.fullName,
           phone: pJson.profile.phone,
         });
-
-        // 🆕 notifications système
         setNotifications(nJson.notifications || []);
       } catch (err: any) {
         console.error(err);
-        setError(
-          err?.message || "Erreur lors du chargement des notifications."
-        );
+        setError(err?.message || "Erreur lors du chargement des notifications.");
       } finally {
         setLoading(false);
       }
@@ -144,11 +149,10 @@ export default function NotificationsPage() {
   // ---------------------------------------------------------------------------
   // BUILD TRANSACTIONS TIMELINE
   // ---------------------------------------------------------------------------
-
   const transactions: TransactionRow[] = useMemo(() => {
     const rows: TransactionRow[] = [];
 
-    // 👉 INVESTISSEMENTS : une seule ligne
+    // INVESTISSEMENTS : 1 ligne
     for (const inv of investments) {
       const status = (inv.status || "").toUpperCase();
 
@@ -178,11 +182,10 @@ export default function NotificationsPage() {
       });
     }
 
-    // 👉 RETRAITS : deux lignes
+    // RETRAITS : 2 lignes (demande + traitement si processedAt)
     for (const w of withdrawals) {
       const status = (w.status || "").toUpperCase();
 
-      // Ligne 1 : demande de retrait
       rows.push({
         id: `W-${w.id}-REQ`,
         date: w.createdAt,
@@ -202,7 +205,6 @@ export default function NotificationsPage() {
         isPendingWithdrawalRequest: status === "PENDING",
       });
 
-      // Ligne 2 : traitement, seulement si processedAt existe
       if (w.processedAt) {
         let finalTone: TransactionRow["statusTone"] = "approved";
         let finalLabel = "Retrait approuvé";
@@ -225,22 +227,16 @@ export default function NotificationsPage() {
       }
     }
 
-    // Tri décroissant par date
-    rows.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-
+    rows.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     return rows;
   }, [investments, withdrawals]);
 
   // ---------------------------------------------------------------------------
   // FILTERS
   // ---------------------------------------------------------------------------
-
   const filteredTransactions = useMemo(() => {
     let list = [...transactions];
 
-    // Filtre "transactions du mois"
     if (filterPeriod === "MONTH") {
       const now = new Date();
       const m = now.getMonth();
@@ -252,7 +248,6 @@ export default function NotificationsPage() {
       });
     }
 
-    // Filtre "approuvés uniquement"
     if (filterApprovedOnly) {
       list = list.filter((t) => t.statusTone === "approved");
     }
@@ -263,12 +258,11 @@ export default function NotificationsPage() {
   // ---------------------------------------------------------------------------
   // RENDER
   // ---------------------------------------------------------------------------
-
   if (loading) {
     return (
       <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-4xl mx-auto text-xs md:text-sm text-sbc-muted">
-          Chargement des notifications...
+          <T>Chargement des notifications...</T>
         </div>
       </main>
     );
@@ -287,30 +281,29 @@ export default function NotificationsPage() {
   return (
     <main className="w-full min-h-[calc(100vh-120px)] px-4 sm:px-6 py-6 sm:py-8">
       <div className="w-full max-w-5xl mx-auto flex flex-col gap-8 md:gap-10">
-        {/* HEADER (léger ajustement pour coller aux autres pages) */}
+        {/* HEADER */}
         <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
             <p className="text-[11px] uppercase tracking-[0.26em] text-sbc-gold">
-              Compte
+              <T>Compte</T>
             </p>
             <h1 className="text-2xl md:text-3xl font-semibold mt-1">
-              Notifications &amp; historique
+              <T>Notifications &amp; historique</T>
             </h1>
             <p className="text-xs md:text-sm text-sbc-muted max-w-xl mt-2 leading-relaxed">
-              Retrouvez ici vos notifications importantes (validations / rejets)
-              ainsi que toutes les opérations financières liées à votre compte :
-              investissements lancés et demandes de retrait (avec leur statut
-              final).
+              <T>
+                Retrouvez ici vos notifications importantes (validations / rejets)
+                ainsi que toutes les opérations financières liées à votre compte :
+                investissements lancés et demandes de retrait (avec leur statut final).
+              </T>
             </p>
           </div>
 
           <div className="flex flex-col items-end gap-2">
             {profile && (
               <div className="text-xs md:text-sm text-sbc-muted text-right">
-                <p>Client</p>
-                <p className="text-sbc-text font-medium">
-                  {profile.fullName}
-                </p>
+                <p><T>Client</T></p>
+                <p className="text-sbc-text font-medium">{profile.fullName}</p>
                 <p className="text-[11px]">{profile.phone}</p>
               </div>
             )}
@@ -320,26 +313,26 @@ export default function NotificationsPage() {
               onClick={() => router.push("/dashboard")}
               className="mt-1 inline-flex items-center gap-2 rounded-full border border-sbc-gold px-4 py-1.5 text-[11px] md:text-xs text-sbc-gold hover:bg-sbc-gold hover:text-sbc-bgSoft transition"
             >
-              <span>⬅ Retour au Dashboard</span>
+              <span>⬅ <T>Retour au Dashboard</T></span>
             </button>
           </div>
         </section>
 
-        {/* 🆕 SECTION NOTIFICATIONS SYSTÈME */}
+        {/* NOTIFICATIONS SYSTÈME */}
         <section className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-4 md:p-6 space-y-3">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm md:text-base font-semibold text-sbc-gold">
-              Notifications récentes
+              <T>Notifications récentes</T>
             </h2>
             <p className="text-[11px] md:text-xs text-sbc-muted">
-              {notifications.length} notification
+              {notifications.length} <T>notification</T>
               {notifications.length > 1 ? "s" : ""}
             </p>
           </div>
 
           {notifications.length === 0 ? (
             <p className="text-xs md:text-sm text-sbc-muted">
-              Vous n&apos;avez encore aucune notification.
+              <T>Vous n&apos;avez encore aucune notification.</T>
             </p>
           ) : (
             <div className="flex flex-col gap-2.5">
@@ -352,7 +345,7 @@ export default function NotificationsPage() {
                 >
                   <div className="flex justify-between items-center mb-1.5 gap-2">
                     <span className="font-semibold text-sbc-text">
-                      {n.title}
+                      <T>{n.title}</T>
                     </span>
                     <span className="text-[10px] md:text-[11px] text-sbc-muted">
                       {new Date(n.createdAt).toLocaleString("fr-FR")}
@@ -360,13 +353,13 @@ export default function NotificationsPage() {
                   </div>
 
                   <p className="text-sbc-muted text-[11px] md:text-xs">
-                    {n.message}
+                    <T>{n.message}</T>
                   </p>
 
                   {!n.readAt && (
                     <span className="mt-1 inline-flex items-center gap-1 text-[10px] text-sbc-gold">
                       <span className="h-1.5 w-1.5 rounded-full bg-sbc-gold animate-pulse" />
-                      Nouveau
+                      <T>Nouveau</T>
                     </span>
                   )}
                 </div>
@@ -375,10 +368,10 @@ export default function NotificationsPage() {
           )}
         </section>
 
-        {/* FILTRES (B : transactions du mois + approuvées uniquement) */}
+        {/* FILTRES */}
         <section className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-4 md:p-5 flex flex-col gap-3">
           <h2 className="text-sm md:text-base font-semibold text-sbc-gold">
-            Filtres
+            <T>Filtres</T>
           </h2>
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -392,7 +385,7 @@ export default function NotificationsPage() {
                     : "bg-transparent text-sbc-text border-sbc-border hover:bg-sbc-bgSoft/60"
                 }`}
               >
-                Toutes les transactions
+                <T>Toutes les transactions</T>
               </button>
               <button
                 type="button"
@@ -403,7 +396,7 @@ export default function NotificationsPage() {
                     : "bg-transparent text-sbc-text border-sbc-border hover:bg-sbc-bgSoft/60"
                 }`}
               >
-                Transactions du mois
+                <T>Transactions du mois</T>
               </button>
             </div>
 
@@ -414,26 +407,28 @@ export default function NotificationsPage() {
                 onChange={(e) => setFilterApprovedOnly(e.target.checked)}
                 className="rounded border-sbc-border bg-sbc-bgSoft text-sbc-gold focus:ring-sbc-gold"
               />
-              <span>Afficher uniquement les transactions approuvées</span>
+              <span>
+                <T>Afficher uniquement les transactions approuvées</T>
+              </span>
             </label>
           </div>
         </section>
 
-        {/* LISTE DES TRANSACTIONS (C : indicateur visuel pour retraits en attente) */}
+        {/* HISTORIQUE */}
         <section className="bg-sbc-bgSoft/70 border border-sbc-border rounded-3xl p-4 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm md:text-base font-semibold text-sbc-gold">
-              Historique détaillé
+              <T>Historique détaillé</T>
             </h2>
             <p className="text-[11px] md:text-xs text-sbc-muted">
-              {filteredTransactions.length} ligne
+              {filteredTransactions.length} <T>ligne</T>
               {filteredTransactions.length > 1 ? "s" : ""}
             </p>
           </div>
 
           {filteredTransactions.length === 0 ? (
             <p className="text-xs md:text-sm text-sbc-muted">
-              Aucune transaction à afficher avec ces filtres.
+              <T>Aucune transaction à afficher avec ces filtres.</T>
             </p>
           ) : (
             <div className="flex flex-col divide-y divide-sbc-border/40">
@@ -471,23 +466,22 @@ export default function NotificationsPage() {
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      {/* Indicateur visuel pour retrait en attente */}
                       {t.isPendingWithdrawalRequest && (
                         <span className="mt-1 inline-flex h-3 w-3 rounded-full bg-amber-400 animate-pulse" />
                       )}
                       <div>
                         <p className="text-[11px] md:text-xs text-sbc-muted">
-                          {dateStr} à {timeStr}
+                          {dateStr} <T>à</T> {timeStr}
                         </p>
                         <p className="text-xs md:text-sm text-sbc-text font-medium">
-                          {t.nature} — {t.label}
+                          <T>{t.nature}</T> — <T>{t.label}</T>
                         </p>
-                        {t.kind === "WITHDRAWAL" &&
-                          t.isPendingWithdrawalRequest && (
-                            <p className="text-[10px] text-amber-300/90 mt-0.5">
-                              En attente de validation par un administrateur.
-                            </p>
-                          )}
+
+                        {t.kind === "WITHDRAWAL" && t.isPendingWithdrawalRequest && (
+                          <p className="text-[10px] text-amber-300/90 mt-0.5">
+                            <T>En attente de validation par un administrateur.</T>
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -498,7 +492,9 @@ export default function NotificationsPage() {
                           XOF
                         </span>
                       </div>
-                      <span className={statusClass}>{t.statusLabel}</span>
+                      <span className={statusClass}>
+                        <T>{t.statusLabel}</T>
+                      </span>
                     </div>
                   </div>
                 );

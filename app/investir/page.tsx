@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { T } from "@/components/T";
 
 interface UserInfo {
   id: number;
@@ -105,9 +106,7 @@ export default function InvestirPage() {
         });
 
         if (!res.ok || !json.success) {
-          throw new Error(
-            json.message || "Erreur chargement investissements."
-          );
+          throw new Error(json.message || "Erreur chargement investissements.");
         }
 
         setInvestments(json.investments || []);
@@ -135,7 +134,6 @@ export default function InvestirPage() {
     setLoading(true);
 
     // ✅ On ne crée plus l'investissement ici
-    // 👉 On passe juste le montant au composant /paiement/[id]
     router.push(`/paiement/${selectedTier}`);
   };
 
@@ -143,7 +141,7 @@ export default function InvestirPage() {
     return (
       <main className="w-full min-h-screen flex items-center justify-center px-4">
         <div className="w-full max-w-xl mx-auto bg-sbc-bgSoft/60 border border-red-700/50 rounded-3xl p-5 text-sm text-red-300 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
-          {errorMessage}
+          <T>{errorMessage}</T>
         </div>
       </main>
     );
@@ -158,28 +156,36 @@ export default function InvestirPage() {
         <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-6 sm:p-7 md:p-9 shadow-[0_25px_60px_rgba(0,0,0,0.9)] backdrop-blur-lg flex flex-col md:flex-row md:justify-between gap-6">
           <div className="flex flex-col gap-2">
             <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
-              Investissements
+              <T>Investissements</T>
             </p>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold">
-              Lancer un investissement
+              <T>Lancer un investissement</T>
             </h1>
             <p className="text-xs sm:text-sm text-sbc-muted max-w-xl leading-relaxed">
-              Choisissez un palier parmi ceux proposés. Chaque palier suit une
-              stratégie de{" "}
+              <T>Choisissez un palier parmi ceux proposés. Chaque palier suit une stratégie de </T>
               <span className="text-sbc-gold font-semibold">
-                90&nbsp;jours
+                <T>90 jours</T>
               </span>{" "}
-              orientée vers la protection du capital. Votre demande passe
-              d&apos;abord en statut{" "}
-              <span className="text-sbc-gold font-semibold">PENDING</span>, puis
-              devient{" "}
-              <span className="text-sbc-gold font-semibold">ACTIVE</span> une
-              fois les fonds confirmés par l&apos;administration.
+              <T>
+                orientée vers la protection du capital. Votre demande passe d&apos;abord en statut{" "}
+              </T>
+              <span className="text-sbc-gold font-semibold">
+                <T>PENDING</T>
+              </span>
+              <T>, puis devient </T>
+              <span className="text-sbc-gold font-semibold">
+                <T>ACTIVE</T>
+              </span>{" "}
+              <T>
+                une fois les fonds confirmés par l&apos;administration.
+              </T>
             </p>
           </div>
 
           <div className="flex flex-col items-start md:items-end gap-1 text-xs sm:text-sm">
-            <p className="text-sbc-muted">Compte</p>
+            <p className="text-sbc-muted">
+              <T>Compte</T>
+            </p>
             {user && (
               <>
                 <p className="text-sbc-text text-xs sm:text-sm">
@@ -198,13 +204,13 @@ export default function InvestirPage() {
                 href="/dashboard"
                 className="px-3 py-1 rounded-full border border-sbc-border text-[11px] text-sbc-muted hover:bg-sbc-bgSoft transition"
               >
-                Dashboard
+                <T>Dashboard</T>
               </Link>
               <button
                 onClick={handleLogout}
                 className="px-3 py-1 rounded-full border border-red-500/70 text-[11px] text-red-300 hover:bg-red-900/40 transition"
               >
-                Déconnexion
+                <T>Déconnexion</T>
               </button>
             </div>
           </div>
@@ -213,25 +219,27 @@ export default function InvestirPage() {
         {/* FORMULAIRE */}
         <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-6 sm:p-7 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.85)] flex flex-col gap-5">
           <h2 className="text-sm md:text-base font-semibold text-sbc-gold">
-            Sélection du palier
+            <T>Sélection du palier</T>
           </h2>
 
           {hasPending && (
             <div className="text-[10px] sm:text-[11px] md:text-xs text-amber-200 bg-amber-900/30 border border-amber-500/60 rounded-2xl px-3 py-2">
-              Vous avez déjà au moins un investissement{" "}
-              <span className="font-semibold">en attente</span>. Il deviendra
-              ACTIVE après validation de vos fonds.
+              <T>Vous avez déjà au moins un investissement </T>
+              <span className="font-semibold">
+                <T>en attente</T>
+              </span>
+              <T>. Il deviendra ACTIVE après validation de vos fonds.</T>
             </div>
           )}
 
           {successMessage && (
             <div className="text-emerald-400 text-[11px] sm:text-xs bg-emerald-950/30 border border-emerald-700/50 rounded-2xl px-3 py-2">
-              {successMessage}
+              <T>{successMessage}</T>
             </div>
           )}
           {errorMessage && (
             <div className="text-red-400 text-[11px] sm:text-xs bg-red-950/30 border border-red-700/50 rounded-2xl px-3 py-2">
-              {errorMessage}
+              <T>{errorMessage}</T>
             </div>
           )}
 
@@ -252,7 +260,7 @@ export default function InvestirPage() {
                   >
                     <p className="font-semibold">{formatXOF(amount)}</p>
                     <p className="text-[10px] text-sbc-muted mt-1">
-                      Durée : 90 jours · validation admin
+                      <T>Durée : 90 jours · validation admin</T>
                     </p>
                   </button>
                 );
@@ -262,17 +270,20 @@ export default function InvestirPage() {
             <div className="border border-sbc-border rounded-2xl p-3 sm:p-4 text-[11px] sm:text-xs text-sbc-muted bg-sbc-bgSoft/40">
               {selectedTier ? (
                 <>
-                  Palier sélectionné :{" "}
+                  <T>Palier sélectionné :</T>{" "}
                   <span className="text-sbc-gold font-semibold">
                     {formatXOF(selectedTier)}
                   </span>
-                  . Après validation, vous serez redirigé vers la page de
-                  paiement où votre demande passera en statut{" "}
-                  <span className="text-sbc-gold font-semibold">PENDING</span>,
-                  puis sera validée après réception de vos fonds.
+                  <T>
+                    . Après validation, vous serez redirigé vers la page de paiement où votre demande passera en statut{" "}
+                  </T>
+                  <span className="text-sbc-gold font-semibold">
+                    <T>PENDING</T>
+                  </span>
+                  <T>, puis sera validée après réception de vos fonds.</T>
                 </>
               ) : (
-                <>Sélectionnez un palier pour continuer.</>
+                <T>Sélectionnez un palier pour continuer.</T>
               )}
             </div>
 
@@ -281,7 +292,7 @@ export default function InvestirPage() {
               disabled={!selectedTier || loading}
               className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 rounded-full bg-sbc-gold text-sbc-bg border border-sbc-gold text-xs md:text-sm font-semibold hover:bg-sbc-goldSoft transition disabled:opacity-60"
             >
-              {loading ? "Envoi..." : "Valider ce palier"}
+              <T>{loading ? "Envoi..." : "Valider ce palier"}</T>
             </button>
           </form>
         </section>
@@ -289,23 +300,29 @@ export default function InvestirPage() {
         {/* LISTE EXISTANTS */}
         <section className="bg-sbc-bgSoft/50 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_18px_50px_rgba(0,0,0,0.85)]">
           <h2 className="text-sm md:text-base font-semibold text-sbc-gold mb-3">
-            Vos investissements
+            <T>Vos investissements</T>
           </h2>
 
           {investments.length === 0 ? (
             <p className="text-xs text-sbc-muted">
-              Aucun investissement pour le moment.
+              <T>Aucun investissement pour le moment.</T>
             </p>
           ) : (
             <div className="w-full overflow-x-auto border border-sbc-border/60 rounded-2xl bg-sbc-bgSoft/40">
               <table className="min-w-full text-[11px] md:text-xs text-sbc-muted">
                 <thead>
                   <tr className="bg-sbc-bgSoft/70 text-sbc-gold">
-                    <th className="p-2 text-left whitespace-nowrap">Montant</th>
-                    <th className="p-2 text-left whitespace-nowrap">Statut</th>
-                    <th className="p-2 text-left whitespace-nowrap">Début</th>
                     <th className="p-2 text-left whitespace-nowrap">
-                      Échéance
+                      <T>Montant</T>
+                    </th>
+                    <th className="p-2 text-left whitespace-nowrap">
+                      <T>Statut</T>
+                    </th>
+                    <th className="p-2 text-left whitespace-nowrap">
+                      <T>Début</T>
+                    </th>
+                    <th className="p-2 text-left whitespace-nowrap">
+                      <T>Échéance</T>
                     </th>
                   </tr>
                 </thead>
@@ -335,13 +352,17 @@ export default function InvestirPage() {
           )}
 
           <p className="mt-3 text-[10px] md:text-[11px] text-sbc-muted leading-relaxed">
-            Un investissement en statut{" "}
-            <span className="text-sbc-gold font-semibold">PENDING</span>{" "}
-            indique que la demande a été enregistrée, mais que les fonds doivent
-            encore être confirmés par Smart Business Corp. Un investissement{" "}
-            <span className="text-sbc-gold font-semibold">ACTIVE</span> est
-            pleinement pris en compte dans la stratégie et dans le calcul des
-            gains.
+            <T>Un investissement en statut </T>
+            <span className="text-sbc-gold font-semibold">
+              <T>PENDING</T>
+            </span>{" "}
+            <T>
+              indique que la demande a été enregistrée, mais que les fonds doivent encore être confirmés par Smart Business Corp. Un investissement{" "}
+            </T>
+            <span className="text-sbc-gold font-semibold">
+              <T>ACTIVE</T>
+            </span>{" "}
+            <T>est pleinement pris en compte dans la stratégie et dans le calcul des gains.</T>
           </p>
         </section>
       </div>
@@ -359,7 +380,7 @@ function StatusBadge({ status }: { status: InvestmentStatus }) {
       <span
         className={`${base} border-amber-400/70 bg-amber-900/30 text-amber-200`}
       >
-        En attente
+        <T>En attente</T>
       </span>
     );
   }
@@ -368,16 +389,14 @@ function StatusBadge({ status }: { status: InvestmentStatus }) {
       <span
         className={`${base} border-emerald-500/70 bg-emerald-900/30 text-emerald-300`}
       >
-        Actif
+        <T>Actif</T>
       </span>
     );
   }
   if (status === "REJECTED") {
     return (
-      <span
-        className={`${base} border-red-500/70 bg-red-900/30 text-red-300`}
-      >
-        Rejeté
+      <span className={`${base} border-red-500/70 bg-red-900/30 text-red-300`}>
+        <T>Rejeté</T>
       </span>
     );
   }

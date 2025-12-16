@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { T } from "@/components/T";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -23,10 +24,8 @@ export default function QuestionFAQPage() {
     try {
       const res = await fetch(`${API_BASE}/api/faq-question`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // optionnel, mais OK si un jour on lie la question à un compte
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ name, phone, email, question }),
       });
 
@@ -57,15 +56,19 @@ export default function QuestionFAQPage() {
         {/* HEADER / CONTEXTE */}
         <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_20px_55px_rgba(0,0,0,0.85)] backdrop-blur-lg flex flex-col gap-3">
           <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-sbc-gold">
-            FAQ • Question
+            <T>FAQ • Question</T>
           </p>
+
           <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold">
-            Posez votre question à l&apos;équipe Smart Business Corp
+            <T>Posez votre question à l&apos;équipe Smart Business Corp</T>
           </h1>
+
           <p className="text-xs sm:text-sm text-sbc-muted leading-relaxed">
-            Utilisez ce formulaire pour nous poser une question précise sur le
-            fonctionnement, les retraits, les paliers ou la gestion du risque.
-            Nous reviendrons vers vous dès que possible avec une réponse claire.
+            <T>
+              Utilisez ce formulaire pour nous poser une question précise sur le
+              fonctionnement, les retraits, les paliers ou la gestion du risque.
+              Nous reviendrons vers vous dès que possible avec une réponse claire.
+            </T>
           </p>
         </section>
 
@@ -88,7 +91,7 @@ export default function QuestionFAQPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] sm:text-xs text-sbc-muted">
-                  Nom complet <span className="text-sbc-gold">*</span>
+                  <T>Nom complet</T> <span className="text-sbc-gold">*</span>
                 </label>
                 <input
                   className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
@@ -96,12 +99,13 @@ export default function QuestionFAQPage() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  aria-label="Nom complet"
                 />
               </div>
 
               <div className="flex flex-col gap-1">
                 <label className="text-[11px] sm:text-xs text-sbc-muted">
-                  Numéro de téléphone (WhatsApp){" "}
+                  <T>Numéro de téléphone (WhatsApp)</T>{" "}
                   <span className="text-sbc-gold">*</span>
                 </label>
                 <input
@@ -110,6 +114,7 @@ export default function QuestionFAQPage() {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  aria-label="Téléphone WhatsApp"
                 />
               </div>
             </div>
@@ -117,7 +122,7 @@ export default function QuestionFAQPage() {
             {/* Email */}
             <div className="flex flex-col gap-1">
               <label className="text-[11px] sm:text-xs text-sbc-muted">
-                Adresse email <span className="text-sbc-gold">*</span>
+                <T>Adresse email</T> <span className="text-sbc-gold">*</span>
               </label>
               <input
                 type="email"
@@ -126,13 +131,14 @@ export default function QuestionFAQPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                aria-label="Email"
               />
             </div>
 
             {/* Question */}
             <div className="flex flex-col gap-1">
               <label className="text-[11px] sm:text-xs text-sbc-muted">
-                Votre question <span className="text-sbc-gold">*</span>
+                <T>Votre question</T> <span className="text-sbc-gold">*</span>
               </label>
               <textarea
                 className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold min-h-[120px]"
@@ -140,15 +146,18 @@ export default function QuestionFAQPage() {
                 required
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
+                aria-label="Votre question"
               />
             </div>
 
             {/* Petit texte de contexte */}
             <p className="text-[10px] sm:text-[11px] text-sbc-muted leading-relaxed">
-              Vos coordonnées ne sont utilisées que pour vous répondre, jamais
-              pour vous spammer. En envoyant ce formulaire, vous acceptez que
-              notre équipe vous contacte pour vous apporter des précisions ou
-              vous orienter vers la documentation adaptée.
+              <T>
+                Vos coordonnées ne sont utilisées que pour vous répondre, jamais
+                pour vous spammer. En envoyant ce formulaire, vous acceptez que
+                notre équipe vous contacte pour vous apporter des précisions ou
+                vous orienter vers la documentation adaptée.
+              </T>
             </p>
 
             {/* Bouton */}
@@ -158,7 +167,7 @@ export default function QuestionFAQPage() {
                 disabled={loading}
                 className="px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg text-xs sm:text-sm font-semibold hover:bg-sbc-goldSoft hover:text-sbc-bg transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? "Envoi en cours..." : "Envoyer ma question"}
+                <T>{loading ? "Envoi en cours..." : "Envoyer ma question"}</T>
               </button>
             </div>
           </form>

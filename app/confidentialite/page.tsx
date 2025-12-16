@@ -1,10 +1,12 @@
 // frontend/app/confidentialite/page.tsx
 import Link from "next/link";
+import { T } from "@/components/T";
 
 const PRIVACY_VERSION = "v1.0";
 const EFFECTIVE_DATE = "01/11/2025";
 
-const PRIVACY_PDF_PATH = "/legal/Politique_Confidentialite_SBC_v1.0.pdf"; // optionnel (public/legal/...)
+const PRIVACY_PDF_PATH =
+  "/legal/Politique_Confidentialite_SBC_v1.0.pdf"; // optionnel
 
 const PRIVACY_CONTENT = `POLITIQUE DE CONFIDENTIALITÉ
 SMART BUSINESS CORP
@@ -72,19 +74,20 @@ Pour toute demande : support@smartbusinesscorp.com
 export default function ConfidentialitePage() {
   return (
     <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 md:px-0 py-6 sm:py-8">
-      {/* Header */}
+      {/* HEADER */}
       <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_18px_45px_rgba(0,0,0,0.85)]">
         <p className="uppercase text-[10px] sm:text-[11px] tracking-[0.25em] text-sbc-gold">
-          Légal
+          <T>Légal</T>
         </p>
 
         <h1 className="text-2xl sm:text-3xl md:text-[32px] font-semibold mt-2 leading-snug">
-          Politique de confidentialité
+          <T>Politique de confidentialité</T>
         </h1>
 
         <p className="mt-2 text-xs sm:text-sm text-sbc-muted leading-relaxed">
-          Version <span className="text-sbc-text">{PRIVACY_VERSION}</span> —
-          Entrée en vigueur :{" "}
+          <T>Version</T>{" "}
+          <span className="text-sbc-text">{PRIVACY_VERSION}</span>{" "}
+          <T>— Entrée en vigueur :</T>{" "}
           <span className="text-sbc-text">{EFFECTIVE_DATE}</span>
         </p>
 
@@ -95,22 +98,22 @@ export default function ConfidentialitePage() {
             rel="noreferrer"
             className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-sbc-border text-xs sm:text-sm text-sbc-text hover:border-sbc-gold hover:text-sbc-gold transition"
           >
-            Télécharger PDF (optionnel)
+            <T>Télécharger le PDF</T>
           </a>
 
           <Link
             href="/cgu"
             className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg text-xs sm:text-sm font-semibold hover:bg-sbc-goldSoft transition"
           >
-            Voir CGU
+            <T>Voir les CGU</T>
           </Link>
         </div>
       </section>
 
-      {/* Content */}
+      {/* CONTENU */}
       <section className="mt-5 sm:mt-6 bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
         <pre className="whitespace-pre-wrap text-[11px] sm:text-xs text-sbc-muted leading-relaxed">
-          {PRIVACY_CONTENT}
+          <T>{PRIVACY_CONTENT}</T>
         </pre>
 
         <div className="mt-6 flex items-center justify-between">
@@ -118,14 +121,14 @@ export default function ConfidentialitePage() {
             href="/"
             className="text-[11px] sm:text-xs text-sbc-muted underline hover:text-sbc-gold"
           >
-            Retour accueil
+            <T>Retour à l’accueil</T>
           </Link>
 
           <Link
             href="/mentions-legales"
             className="text-[11px] sm:text-xs text-sbc-muted underline hover:text-sbc-gold"
           >
-            Mentions légales
+            <T>Mentions légales</T>
           </Link>
         </div>
       </section>

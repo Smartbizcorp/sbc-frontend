@@ -5,6 +5,7 @@ import Link from "next/link";
 import { normalizeSenegalPhone } from "@/src/utils/phone";
 import { register as apiRegister } from "../../lib/api";
 import { trackEvent } from "@/lib/analytics";
+import { T, useTr } from "@/components/T";
 
 const SECURITY_QUESTIONS = [
   "Nom de votre premier établissement scolaire",
@@ -19,7 +20,6 @@ const SECURITY_QUESTIONS = [
   "Titre du premier film vu au cinéma",
 ] as const;
 
-// 🧾 Contenu CGU (à remplacer par ton texte réel ou un résumé + lien)
 const CGU_CONTENT = `
 Conditions Générales d’Utilisation — Smart Business Corp
 
@@ -45,6 +45,8 @@ En cochant la case, vous acceptez l’intégralité des CGU.
 `.trim();
 
 export default function RegisterPage() {
+  const { tr } = useTr();
+
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -55,11 +57,9 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // 🔐 Question de sécurité
   const [securityQuestion, setSecurityQuestion] = useState("");
   const [securityAnswer, setSecurityAnswer] = useState("");
 
-  // ✅ CGU
   const [acceptCgu, setAcceptCgu] = useState(false);
   const [showCguModal, setShowCguModal] = useState(false);
 
@@ -67,16 +67,15 @@ export default function RegisterPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // --- RÈGLES DE SÉCURITÉ (alignées sur ton backend : longueur + lettre + chiffre) ---
+  // --- RÈGLES DE SÉCURITÉ ---
   const hasLength = password.length >= 8;
   const hasLetter = /[A-Za-z]/.test(password);
   const hasNumber = /\d/.test(password);
-  const hasUpper = /[A-Z]/.test(password); // bonus (recommandé)
+  const hasUpper = /[A-Z]/.test(password);
 
   const isStrongPassword = (pwd: string) =>
     pwd.length >= 8 && /[A-Za-z]/.test(pwd) && /[0-9]/.test(pwd);
 
-  // Score pour jauge : 0–4
   const passwordScore = useMemo(() => {
     let score = 0;
     if (hasLength) score++;
@@ -144,7 +143,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // 🔐 Validation question de sécurité obligatoire
     if (!securityQuestion) {
       setErrorMessage("Veuillez choisir une question de sécurité.");
       setLoading(false);
@@ -152,14 +150,11 @@ export default function RegisterPage() {
     }
 
     if (!securityAnswer.trim()) {
-      setErrorMessage(
-        "Veuillez renseigner la réponse à la question de sécurité."
-      );
+      setErrorMessage("Veuillez renseigner la réponse à la question de sécurité.");
       setLoading(false);
       return;
     }
 
-    // ✅ CGU obligatoire
     if (!acceptCgu) {
       setErrorMessage(
         "Veuillez accepter les Conditions Générales d’Utilisation (CGU) pour continuer."
@@ -169,7 +164,6 @@ export default function RegisterPage() {
     }
 
     try {
-      // On passe par lib/api.ts → POST /api/register
       const data = await apiRegister({
         fullName,
         phone,
@@ -178,20 +172,16 @@ export default function RegisterPage() {
         password,
         securityQuestion,
         securityAnswer,
-        // Si ton backend ne le prend pas, tu peux retirer cette ligne.
         acceptCgu,
       } as any);
 
-      if (
-        !data ||
-        (typeof data === "object" && (data as any).success === false)
-      ) {
+      if (!data || (typeof data === "object" && (data as any).success === false)) {
         throw new Error((data as any)?.message || "Erreur lors de l'inscription.");
       }
 
-      
       setSuccessMessage("Compte créé ! Vous pouvez vous connecter.");
       trackEvent("register_success", { method: "phone" });
+
       setFullName("");
       setPhone("");
       setEmail("");
@@ -209,7 +199,6 @@ export default function RegisterPage() {
     }
   };
 
-  // Petits composants d’icône œil SVG
   const EyeOpenIcon = () => (
     <svg
       className="w-4 h-4"
@@ -243,30 +232,31 @@ export default function RegisterPage() {
 
   return (
     <div className="w-full max-w-3xl mx-auto px-3 sm:px-4 md:px-0 flex flex-col gap-6 sm:gap-8 md:gap-10">
-      {/* HEADER / INTRO INSCRIPTION */}
+      {/* HEADER */}
       <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_18px_45px_rgba(0,0,0,0.85)]">
         <p className="uppercase text-[10px] sm:text-[11px] tracking-[0.25em] text-sbc-gold">
-          Inscription
+          <T>Inscription</T>
         </p>
         <h1 className="text-2xl sm:text-3xl md:text-[32px] font-semibold mt-2 mb-2 sm:mb-3 leading-snug">
-          Créez votre compte Smart Business Corp
+          <T>Créez votre compte Smart Business Corp</T>
         </h1>
         <p className="text-xs sm:text-sm text-sbc-muted leading-relaxed max-w-xl">
-          Inscrivez-vous pour commencer à investir et suivre vos gains.
+          <T>Inscrivez-vous pour commencer à investir et suivre vos gains.</T>
         </p>
       </section>
 
-      {/* FORMULAIRE INSCRIPTION */}
+      {/* FORMULAIRE */}
       <section className="bg-sbc-bgSoft/60 border border-sbc-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
         <form className="flex flex-col gap-5 sm:gap-6" onSubmit={handleSubmit}>
           {successMessage && (
             <div className="text-[10px] sm:text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-700/40 rounded-2xl px-3 py-2">
-              {successMessage}
+              <T>{successMessage}</T>
             </div>
           )}
+
           {errorMessage && (
             <div className="text-[10px] sm:text-xs text-red-400 bg-red-950/30 border border-red-700/40 rounded-2xl px-3 py-2">
-              {errorMessage}
+              <T>{errorMessage}</T>
             </div>
           )}
 
@@ -275,62 +265,64 @@ export default function RegisterPage() {
             <input
               type="text"
               required
-              placeholder="Nom complet"
+              placeholder={tr("Nom complet")}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
+              aria-label={tr("Nom complet")}
             />
 
             <input
               type="tel"
               required
-              placeholder="+221 77 000 00 00"
+              placeholder={tr("+221 77 000 00 00")}
               value={phone}
               onChange={(e) => setPhone(normalizeSenegalPhone(e.target.value))}
               className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
+              aria-label={tr("Téléphone")}
             />
           </div>
 
           {/* Email */}
           <input
             type="email"
-            placeholder="Adresse email (optionnelle)"
+            placeholder={tr("Adresse email (optionnelle)")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
+            aria-label={tr("Email")}
           />
 
-          {/* Mot de passe + confirmation + jauge */}
+          {/* Password + confirm + jauge */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Mot de passe */}
+            {/* Password */}
             <div>
               <label className="block text-[11px] text-sbc-muted mb-1">
-                Mot de passe
+                <T>Mot de passe</T>
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   required
-                  placeholder="Mot de passe sécurisé"
+                  placeholder={tr("Mot de passe sécurisé")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text pr-9 outline-none focus:border-sbc-gold"
+                  aria-label={tr("Mot de passe")}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
-                  aria-label={
-                    showPassword
-                      ? "Masquer le mot de passe"
-                      : "Afficher le mot de passe"
-                  }
+                  aria-label={tr(
+                    showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"
+                  )}
                 >
                   {showPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
                 </button>
               </div>
 
-              {/* Jauge de sécurité */}
+              {/* Jauge */}
               <div className="mt-2 space-y-1">
                 <div className="w-full h-1.5 rounded-full bg-sbc-bg/80 overflow-hidden">
                   <div
@@ -339,118 +331,106 @@ export default function RegisterPage() {
                   />
                 </div>
                 {strengthLabel && (
-                  <p className="text-[10px] text-sbc-muted">{strengthLabel}</p>
+                  <p className="text-[10px] text-sbc-muted">
+                    <T>{strengthLabel}</T>
+                  </p>
                 )}
               </div>
 
               {/* Checklist */}
               <ul className="mt-2 space-y-1 text-[10px] text-sbc-muted">
                 <li className="flex items-center gap-1">
-                  <span
-                    className={hasLength ? "text-emerald-400" : "text-sbc-muted"}
-                  >
-                    ●
-                  </span>
-                  <span>Au moins 8 caractères</span>
+                  <span className={hasLength ? "text-emerald-400" : "text-sbc-muted"}>●</span>
+                  <span><T>Au moins 8 caractères</T></span>
                 </li>
                 <li className="flex items-center gap-1">
-                  <span
-                    className={hasLetter ? "text-emerald-400" : "text-sbc-muted"}
-                  >
-                    ●
-                  </span>
-                  <span>Contient des lettres (a–z)</span>
+                  <span className={hasLetter ? "text-emerald-400" : "text-sbc-muted"}>●</span>
+                  <span><T>Contient des lettres (a–z)</T></span>
                 </li>
                 <li className="flex items-center gap-1">
-                  <span
-                    className={hasNumber ? "text-emerald-400" : "text-sbc-muted"}
-                  >
-                    ●
-                  </span>
-                  <span>Contient des chiffres (0–9)</span>
+                  <span className={hasNumber ? "text-emerald-400" : "text-sbc-muted"}>●</span>
+                  <span><T>Contient des chiffres (0–9)</T></span>
                 </li>
                 <li className="flex items-center gap-1">
-                  <span
-                    className={hasUpper ? "text-emerald-400" : "text-sbc-muted"}
-                  >
-                    ●
-                  </span>
-                  <span>Majuscule recommandée (A–Z)</span>
+                  <span className={hasUpper ? "text-emerald-400" : "text-sbc-muted"}>●</span>
+                  <span><T>Majuscule recommandée (A–Z)</T></span>
                 </li>
               </ul>
             </div>
 
-            {/* Confirmer mot de passe */}
+            {/* Confirm */}
             <div>
               <label className="block text-[11px] text-sbc-muted mb-1">
-                Confirmer le mot de passe
+                <T>Confirmer le mot de passe</T>
               </label>
               <div className="relative">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   required
-                  placeholder="Confirmer le mot de passe"
+                  placeholder={tr("Confirmer le mot de passe")}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text pr-9 outline-none focus:border-sbc-gold"
+                  aria-label={tr("Confirmer le mot de passe")}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sbc-muted hover:text-sbc-gold transition"
-                  aria-label={
-                    showConfirmPassword
-                      ? "Masquer la confirmation"
-                      : "Afficher la confirmation"
-                  }
+                  aria-label={tr(
+                    showConfirmPassword ? "Masquer la confirmation" : "Afficher la confirmation"
+                  )}
                 >
                   {showConfirmPassword ? <EyeOffIcon /> : <EyeOpenIcon />}
                 </button>
               </div>
+
               {!passwordsMatch && (
                 <p className="mt-1 text-[10px] text-red-400">
-                  Les mots de passe ne correspondent pas.
+                  <T>Les mots de passe ne correspondent pas.</T>
                 </p>
               )}
             </div>
           </div>
 
-          {/* Numéro Wave */}
+          {/* Wave */}
           <div>
             <label className="block text-[11px] text-sbc-muted mb-1">
-              Numéro Wave
+              <T>Numéro Wave</T>
             </label>
             <input
               type="tel"
               required
-              placeholder="Numéro Wave (+221...)"
+              placeholder={tr("Numéro Wave (+221...)")}
               value={waveNumber}
               onChange={(e) => setWaveNumber(normalizeSenegalPhone(e.target.value))}
               className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
+              aria-label={tr("Numéro Wave")}
             />
           </div>
 
-          {/* Question de sécurité obligatoire */}
+          {/* Security */}
           <div className="mt-2 pt-3 border-t border-sbc-border/40">
             <h3 className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-sbc-gold mb-2">
-              Question de sécurité (obligatoire)
+              <T>Question de sécurité (obligatoire)</T>
             </h3>
 
             <div className="flex flex-col gap-3">
               <div>
                 <label className="block text-[11px] text-sbc-muted mb-1">
-                  Question
+                  <T>Question</T>
                 </label>
                 <select
                   required
                   value={securityQuestion}
                   onChange={(e) => setSecurityQuestion(e.target.value)}
                   className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
+                  aria-label={tr("Question")}
                 >
-                  <option value="">Sélectionnez une question</option>
+                  <option value="">{tr("Sélectionnez une question")}</option>
                   {SECURITY_QUESTIONS.map((q) => (
                     <option key={q} value={q}>
-                      {q}
+                      {tr(q)}
                     </option>
                   ))}
                 </select>
@@ -458,24 +438,25 @@ export default function RegisterPage() {
 
               <div>
                 <label className="block text-[11px] text-sbc-muted mb-1">
-                  Réponse
+                  <T>Réponse</T>
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Votre réponse (secrète)"
+                  placeholder={tr("Votre réponse (secrète)")}
                   value={securityAnswer}
                   onChange={(e) => setSecurityAnswer(e.target.value)}
                   className="w-full rounded-2xl border border-sbc-border bg-sbc-bgSoft px-3 py-2 text-xs sm:text-sm text-sbc-text outline-none focus:border-sbc-gold"
+                  aria-label={tr("Réponse")}
                 />
                 <p className="text-[10px] text-sbc-muted mt-1">
-                  Cette réponse vous sera demandée en cas de vérification de sécurité.
+                  <T>Cette réponse vous sera demandée en cas de vérification de sécurité.</T>
                 </p>
               </div>
             </div>
           </div>
 
-          {/* ✅ CGU obligatoire */}
+          {/* CGU */}
           <div className="mt-2 pt-3 border-t border-sbc-border/40">
             <div className="flex items-start gap-3">
               <input
@@ -485,46 +466,50 @@ export default function RegisterPage() {
                 onChange={(e) => setAcceptCgu(e.target.checked)}
                 className="mt-1 h-4 w-4 accent-sbc-gold"
                 required
+                aria-label={tr("J’accepte les CGU")}
               />
               <label htmlFor="acceptCgu" className="text-[11px] sm:text-xs text-sbc-muted leading-relaxed">
-                J’ai lu et j’accepte les{" "}
+                <T>J’ai lu et j’accepte les </T>
                 <button
                   type="button"
                   onClick={() => setShowCguModal(true)}
                   className="underline hover:text-sbc-gold text-sbc-text"
+                  aria-label={tr("Ouvrir les CGU")}
                 >
-                  Conditions Générales d’Utilisation (CGU)
+                  <T>Conditions Générales d’Utilisation (CGU)</T>
                 </button>
-                .
+                <T>.</T>
               </label>
             </div>
           </div>
 
-          {/* Bouton & lien login */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
             className="mt-1 inline-flex items-center justify-center px-4 py-2 rounded-full border border-sbc-gold bg-sbc-gold text-sbc-bg text-xs sm:text-sm font-semibold hover:bg-sbc-goldSoft transition disabled:opacity-50"
+            aria-label={tr(loading ? "Création du compte..." : "Créer mon compte")}
           >
-            {loading ? "Création..." : "Créer mon compte"}
+            <T>{loading ? "Création..." : "Créer mon compte"}</T>
           </button>
 
           <Link
             href="/login"
             className="text-[11px] sm:text-xs text-sbc-muted underline hover:text-sbc-gold mt-1"
+            aria-label={tr("Aller à la connexion")}
           >
-            J’ai déjà un compte
+            <T>J’ai déjà un compte</T>
           </Link>
         </form>
       </section>
 
-      {/* 🧾 MODALE CGU */}
+      {/* MODALE CGU */}
       {showCguModal && (
         <div
           className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3"
           role="dialog"
           aria-modal="true"
-          aria-label="Conditions Générales d’Utilisation"
+          aria-label={tr("Conditions Générales d’Utilisation")}
           onClick={() => setShowCguModal(false)}
         >
           <div
@@ -534,29 +519,31 @@ export default function RegisterPage() {
             <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-sbc-border/50">
               <div>
                 <p className="uppercase text-[10px] tracking-[0.25em] text-sbc-gold">
-                  CGU
+                  <T>CGU</T>
                 </p>
                 <h3 className="text-base sm:text-lg font-semibold">
-                  Conditions Générales d’Utilisation
+                  <T>Conditions Générales d’Utilisation</T>
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCguModal(false)}
                 className="rounded-full border border-sbc-border px-3 py-1 text-xs text-sbc-muted hover:text-sbc-gold hover:border-sbc-gold transition"
+                aria-label={tr("Fermer")}
               >
-                Fermer
+                <T>Fermer</T>
               </button>
             </div>
 
-            <Link href="/cgu" className="underline hover:text-sbc-gold">
-  lire les CGU
-</Link>
-
+            <div className="px-5 sm:px-6 pt-4">
+              <Link href="/cgu" className="underline hover:text-sbc-gold" aria-label={tr("Lire les CGU")}>
+                <T>Lire les CGU</T>
+              </Link>
+            </div>
 
             <div className="px-5 sm:px-6 py-4 max-h-[65vh] overflow-auto">
               <pre className="whitespace-pre-wrap text-[11px] sm:text-xs text-sbc-muted leading-relaxed">
-                {CGU_CONTENT}
+                <T>{CGU_CONTENT}</T>
               </pre>
 
               <div className="mt-4 flex items-center justify-end gap-2">
@@ -564,9 +551,11 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowCguModal(false)}
                   className="rounded-full border border-sbc-border px-4 py-2 text-xs sm:text-sm text-sbc-text hover:border-sbc-gold hover:text-sbc-gold transition"
+                  aria-label={tr("Retour")}
                 >
-                  Retour
+                  <T>Retour</T>
                 </button>
+
                 <button
                   type="button"
                   onClick={() => {
@@ -574,26 +563,28 @@ export default function RegisterPage() {
                     setShowCguModal(false);
                   }}
                   className="rounded-full border border-sbc-gold bg-sbc-gold px-4 py-2 text-xs sm:text-sm font-semibold text-sbc-bg hover:bg-sbc-goldSoft transition"
+                  aria-label={tr("J’accepte")}
                 >
-                  J’accepte
+                  <T>J’accepte</T>
                 </button>
+
                 <button
                   type="button"
                   onClick={() => {
-                trackEvent("cgu_open", { context: "register" });
-                setShowCguModal(true);
-                 }}
-  className="rounded-full border border-sbc-border bg-sbc-bgSoft px-4 py-2 text-[11px] text-sbc-muted hover:border-sbc-gold hover:text-sbc-gold transition"
->
-  Lire les CGU
-</button>
-
+                    trackEvent("cgu_open", { context: "register" });
+                    setShowCguModal(true);
+                  }}
+                  className="rounded-full border border-sbc-border bg-sbc-bgSoft px-4 py-2 text-[11px] text-sbc-muted hover:border-sbc-gold hover:text-sbc-gold transition"
+                  aria-label={tr("Lire les CGU")}
+                >
+                  <T>Lire les CGU</T>
+                </button>
               </div>
 
-              {/* Alternative: lien vers une page dédiée */}
               <p className="mt-4 text-[10px] text-sbc-muted">
-                Option recommandée : publier aussi une page dédiée{" "}
-                <span className="text-sbc-text">/cgu</span> pour le SEO et la preuve d’accès.
+                <T>Option recommandée : publier aussi une page dédiée </T>
+                <span className="text-sbc-text">/cgu</span>
+                <T> pour le SEO et la preuve d’accès.</T>
               </p>
             </div>
           </div>
