@@ -4,16 +4,6 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { useLang } from "@/lib/i18n-provider";
 
-/**
- * ✅ Usage
- *   <T>Accueil</T>
- *   <button><T>S'inscrire</T></button>
- *
- * ✅ Traduction "string" via hook
- *   const { tr } = useTr();
- *   <input placeholder={tr("Mot de passe sécurisé")} />
- */
-
 /* =========================
    Helpers
 ========================= */
@@ -39,17 +29,19 @@ async function callTranslateApi(
     body: JSON.stringify({ sourceText, sourceLocale, targetLocale }),
   });
 
-  if (!res.ok) {
-    const t = await res.text().catch(() => "");
-    throw new Error(`translate failed: ${res.status} ${t || ""}`.trim());
+  const json = await res.json().catch(() => ({} as any));
+
+  // backend renvoie {success, translated}
+  if (!res.ok || json?.success !== true) {
+    const msg = json?.message || `translate failed: ${res.status}`;
+    throw new Error(msg);
   }
 
-  const json = (await res.json()) as { translated?: string };
-  return json.translated ?? sourceText;
+  return (json?.translated as string) ?? sourceText;
 }
 
 /* =========================
-   Cache mémoire
+   Cache mémoire (évite spam)
 ========================= */
 const memCache = new Map<string, string>();
 const inflight = new Map<string, Promise<string>>();
@@ -73,9 +65,11 @@ export function useTr() {
 
       const key = stableKey(locale, src);
 
+      // 1) cache mémoire
       const memHit = memCache.get(key);
       if (memHit) return memHit;
 
+      // 2) cache localStorage
       if (typeof window !== "undefined") {
         const lsHit = window.localStorage.getItem(key);
         if (lsHit) {
@@ -84,15 +78,14 @@ export function useTr() {
         }
       }
 
-      
+      // 3) pas trouvé => on planifie une traduction
       pendingRef.current.add(src);
-      return src;
+      return src; // fallback immédiat
     },
     [locale, normalize]
   );
 
   useEffect(() => {
-    
     if (!locale || locale === DEFAULT_LOCALE) return;
 
     const list = Array.from(pendingRef.current);
@@ -107,7 +100,6 @@ export function useTr() {
 
         if (memCache.has(key)) continue;
 
-
         let p = inflight.get(key);
         if (!p) {
           p = callTranslateApi(src, locale, DEFAULT_LOCALE)
@@ -118,18 +110,16 @@ export function useTr() {
               }
               return translated;
             })
-            .finally(() => {
-              inflight.delete(key);
-            });
+            .finally(() => inflight.delete(key));
           inflight.set(key, p);
         }
 
         try {
           await p;
           if (canceled) return;
-          force((x) => x + 1);
+          force((x) => x + 1); // re-render quand une traduction arrive
         } catch {
-          // ignore
+          // ignore: fallback = texte source
         }
       }
     })();
@@ -143,7 +133,7 @@ export function useTr() {
 }
 
 /* =========================
-   ✅ <T> branché sur LangProvider
+   <T> ✅ branché sur useTr()
 ========================= */
 export function T({ children }: { children: React.ReactNode }) {
   const raw = typeof children === "string" ? children : null;
