@@ -1,9 +1,11 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
+import { T } from "@/components/T";
+import { useTr } from "@/lib/useTr";
 
 export function Footer() {
+  const { tr } = useTr();
+
   return (
     <footer className="mt-10 border-t border-sbc-border bg-sbc-bg/90 backdrop-blur">
       <div
@@ -41,7 +43,7 @@ export function Footer() {
                 Smart Business Corp
               </span>
               <span className="text-[10px] sm:text-[11px] text-sbc-muted">
-                Plateforme d&apos;investissement encadrée
+                <T>Plateforme d'investissement encadrée</T>
               </span>
             </div>
           </div>
@@ -50,61 +52,55 @@ export function Footer() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-[11px] md:text-xs">
             <div className="flex flex-col gap-1.5">
               <p className="text-sbc-muted uppercase tracking-[0.18em] text-[10px]">
-                Navigation
+                <T>Navigation</T>
               </p>
+
               <Link href="/" className="text-sbc-muted hover:text-sbc-gold">
-                Accueil
-              </Link>
-              <Link
-                href="/qui-sommes-nous"
-                className="text-sbc-muted hover:text-sbc-gold"
-              >
-                Qui sommes-nous
-              </Link>
-              <Link href="/faq" className="text-sbc-muted hover:text-sbc-gold">
-                FAQ &amp; Risques
-              </Link>
-              <Link
-                href="/login"
-                className="text-sbc-muted hover:text-sbc-gold"
-              >
-                Espace client
+                <T>Accueil</T>
               </Link>
 
-              {/* ✅ Légal */}
+              <Link href="/qui-sommes-nous" className="text-sbc-muted hover:text-sbc-gold">
+                <T>Qui sommes-nous</T>
+              </Link>
+
+              <Link href="/faq" className="text-sbc-muted hover:text-sbc-gold">
+                <T>FAQ &amp; Risques</T>
+              </Link>
+
+              <Link href="/login" className="text-sbc-muted hover:text-sbc-gold">
+                <T>Espace client</T>
+              </Link>
+
               <Link href="/cgu" className="text-sbc-muted hover:text-sbc-gold">
-                CGU
+                <T>CGU</T>
               </Link>
-              <Link
-                href="/confidentialite"
-                className="text-sbc-muted hover:text-sbc-gold"
-              >
-                Politique de confidentialité
+
+              <Link href="/confidentialite" className="text-sbc-muted hover:text-sbc-gold">
+                <T>Politique de confidentialité</T>
               </Link>
-              <Link
-                href="/mentions-legales"
-                className="text-sbc-muted hover:text-sbc-gold"
-              >
-                Mentions légales
+
+              <Link href="/mentions-legales" className="text-sbc-muted hover:text-sbc-gold">
+                <T>Mentions légales</T>
               </Link>
             </div>
 
             <div className="flex flex-col gap-1.5">
               <p className="text-sbc-muted uppercase tracking-[0.18em] text-[10px]">
-                Contact
+                <T>Contact</T>
               </p>
+
               <p className="text-sbc-muted">
-                Support WhatsApp :{" "}
+                {tr("Support WhatsApp :")}{" "}
                 <span className="text-sbc-gold">+221 XX XXX XX XX</span>
               </p>
+
               <p className="text-sbc-muted">
-                Email :{" "}
-                <span className="text-sbc-gold">
-                  support@smartbusinesscorp.com
-                </span>
+                {tr("Email :")}{" "}
+                <span className="text-sbc-gold">support@smartbusinesscorp.com</span>
               </p>
+
               <p className="text-sbc-muted">
-                Moyen de paiement : <span className="text-sbc-gold">Wave</span>
+                {tr("Moyen de paiement :")} <span className="text-sbc-gold">Wave</span>
               </p>
             </div>
           </div>
@@ -130,31 +126,26 @@ export function Footer() {
           "
         >
           <p>
-            © {new Date().getFullYear()} Smart Business Corp. Tous droits
-            réservés.
+            © {new Date().getFullYear()} Smart Business Corp.{" "}
+            <T>Tous droits réservés.</T>
           </p>
 
           <div className="flex flex-col md:items-end gap-1">
             <p>
-              L&apos;investissement comporte un risque de perte en capital.
-              Investissez de manière responsable.
+              <T>
+                L'investissement comporte un risque de perte en capital. Investissez de manière responsable.
+              </T>
             </p>
 
             <div className="flex flex-wrap gap-x-3 gap-y-1 justify-center md:justify-end">
               <Link href="/cgu" className="underline hover:text-sbc-gold">
-                CGU
+                <T>CGU</T>
               </Link>
-              <Link
-                href="/confidentialite"
-                className="underline hover:text-sbc-gold"
-              >
-                Confidentialité
+              <Link href="/confidentialite" className="underline hover:text-sbc-gold">
+                <T>Confidentialité</T>
               </Link>
-              <Link
-                href="/mentions-legales"
-                className="underline hover:text-sbc-gold"
-              >
-                Mentions légales
+              <Link href="/mentions-legales" className="underline hover:text-sbc-gold">
+                <T>Mentions légales</T>
               </Link>
             </div>
           </div>
