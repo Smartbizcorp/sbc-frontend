@@ -1,24 +1,21 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { useLang } from "@/lib/i18n-provider";
-import { useAutoTranslate } from "@/lib/useAutoTranslate";
 
 /**
- * ✅ Usage actuel (inchangé)
+ * ✅ Usage
  *   <T>Accueil</T>
  *   <button><T>S'inscrire</T></button>
  *
- * ✅ Nouveau : traduction "string" via fonction tr()
+ * ✅ Traduction "string" via hook
  *   const { tr } = useTr();
  *   <input placeholder={tr("Mot de passe sécurisé")} />
- *   <option>{tr("Sélectionnez une question")}</option>
- *   <span aria-label={tr("Fermer")}>...</span>
  */
 
 /* =========================
-   Helpers (copiés de ton hook)
+   Helpers
 ========================= */
 function stableKey(locale: string, source: string) {
   let h = 5381;
@@ -30,7 +27,7 @@ function stableKey(locale: string, source: string) {
 async function callTranslateApi(
   sourceText: string,
   targetLocale: string,
-  sourceLocale = "fr"
+  sourceLocale = DEFAULT_LOCALE
 ) {
   const base =
     process.env.NEXT_PUBLIC_TRANSLATE_URL ||
@@ -52,54 +49,33 @@ async function callTranslateApi(
 }
 
 /* =========================
-   Cache mémoire (évite spam)
+   Cache mémoire
 ========================= */
 const memCache = new Map<string, string>();
 const inflight = new Map<string, Promise<string>>();
 
 /* =========================
-   <T> inchangé (ta version)
-========================= */
-export function T({ children }: { children: React.ReactNode }) {
-  const raw = typeof children === "string" ? children : null;
-  const { text } = useAutoTranslate(raw ?? "");
-
-  if (raw === null) return <>{children}</>;
-  return <span suppressHydrationWarning>{text}</span>;
-}
-
-/* =========================
    ✅ Hook : useTr() → tr("...")
-   - Retourne une STRING immédiatement
-   - Lance la traduction en background si manquante
-   - Re-render automatiquement quand dispo
 ========================= */
 export function useTr() {
   const { locale } = useLang();
 
-  const [tick, setTick] = useState(0); // force re-render quand une traduction arrive
-  const tickRef = useRef(0);
-
-  // petite file des textes demandés pendant le render
+  const [, force] = useState(0);
   const pendingRef = useRef<Set<string>>(new Set());
 
-  // normalise comme ton hook
   const normalize = useCallback((s: string) => (s ?? "").trim(), []);
 
   const tr = useCallback(
     (sourceText: string) => {
       const src = normalize(sourceText);
-
       if (!src) return "";
       if (!locale || locale === DEFAULT_LOCALE) return src;
 
       const key = stableKey(locale, src);
 
-      // 1) cache mémoire
       const memHit = memCache.get(key);
       if (memHit) return memHit;
 
-      // 2) cache localStorage
       if (typeof window !== "undefined") {
         const lsHit = window.localStorage.getItem(key);
         if (lsHit) {
@@ -108,15 +84,15 @@ export function useTr() {
         }
       }
 
-      // 3) pas trouvé => on planifie une traduction (sans bloquer le render)
+      
       pendingRef.current.add(src);
-      return src; // fallback immédiat
+      return src;
     },
     [locale, normalize]
   );
 
   useEffect(() => {
-    // Rien à faire si FR
+    
     if (!locale || locale === DEFAULT_LOCALE) return;
 
     const list = Array.from(pendingRef.current);
@@ -129,10 +105,9 @@ export function useTr() {
       for (const src of list) {
         const key = stableKey(locale, src);
 
-        // déjà rempli entre temps ?
         if (memCache.has(key)) continue;
 
-        // inflight partagé (évite appels multiples)
+
         let p = inflight.get(key);
         if (!p) {
           p = callTranslateApi(src, locale, DEFAULT_LOCALE)
@@ -152,12 +127,9 @@ export function useTr() {
         try {
           await p;
           if (canceled) return;
-
-          // force re-render (un tick suffit)
-          tickRef.current += 1;
-          setTick(tickRef.current);
+          force((x) => x + 1);
         } catch {
-          // on ignore l'erreur ici (fallback = texte source)
+          // ignore
         }
       }
     })();
@@ -165,7 +137,18 @@ export function useTr() {
     return () => {
       canceled = true;
     };
-  }, [locale, tick]); // tick permet de “drainer” les nouveaux textes demandés
+  }, [locale]);
 
   return { tr, locale };
+}
+
+/* =========================
+   ✅ <T> branché sur LangProvider
+========================= */
+export function T({ children }: { children: React.ReactNode }) {
+  const raw = typeof children === "string" ? children : null;
+  const { tr } = useTr();
+
+  if (raw === null) return <>{children}</>;
+  return <span suppressHydrationWarning>{tr(raw)}</span>;
 }
