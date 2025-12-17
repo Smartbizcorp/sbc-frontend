@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { normalizeSenegalPhone } from "@/src/utils/phone";
 import { login as apiLogin } from "../../lib/api";
-import { T, useTr } from "@/components/T";
+import { T } from "@/components/T";
+import { useTr } from "@/lib/useTr";
+
 
 export default function LoginPage() {
   const router = useRouter();

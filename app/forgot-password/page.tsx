@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { normalizeSenegalPhone } from "@/src/utils/phone";
-import { T, useTr } from "@/components/T";
+import { T } from "@/components/T";
+import { useTr } from "@/lib/useTr";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 

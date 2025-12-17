@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { T, useTr } from "@/components/T";
+import { T } from "@/components/T";
+import { useTr } from "@/lib/useTr";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 

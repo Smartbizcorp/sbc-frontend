@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { T, useTr } from "@/components/T";
+import { T } from "@/components/T";
+import { useTr } from "@/lib/useTr";
+
 
 interface Withdrawal {
   id: number;

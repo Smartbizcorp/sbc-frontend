@@ -5,7 +5,9 @@ import Link from "next/link";
 import { normalizeSenegalPhone } from "@/src/utils/phone";
 import { register as apiRegister } from "../../lib/api";
 import { trackEvent } from "@/lib/analytics";
-import { T, useTr } from "@/components/T";
+import { T } from "@/components/T";
+import { useTr } from "@/lib/useTr";
+
 
 const SECURITY_QUESTIONS = [
   "Nom de votre premier établissement scolaire",
